@@ -38,7 +38,9 @@ jobs:
           echo "${{ secrets.APP_PROPERTIES }}" > ./application.yml
 
       - name: Build with Gradle
-        run: ./gradlew clean build -x test
+        run: |
+          ./gradlew wrapper
+          ./gradlew clean build -x test
 
       - name: Docker build and push
         if: contains(github.ref, 'main')

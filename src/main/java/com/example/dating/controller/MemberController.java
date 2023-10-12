@@ -1,10 +1,12 @@
 package com.example.dating.controller;
 
-import com.example.dating.dto.MemberDto;
+import com.example.dating.dto.MemberInfoDto;
+import com.example.dating.security.auth.PrincipalDetails;
 import com.example.dating.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,11 +20,17 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/member/info")
-    public ResponseEntity<String> info(@Validated @RequestBody MemberDto memberDto, BindingResult bindingResult) {
+    public ResponseEntity<String> info(
+            @Validated @RequestBody MemberInfoDto memberInfoDto,
+            BindingResult bindingResult,
+            @AuthenticationPrincipal PrincipalDetails principalDetails) {
+
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
         }
-        memberService.save(memberDto);
+
+        String email = principalDetails.getUsername();
+        memberService.save(email, memberInfoDto);
         return new ResponseEntity<>("회원정보 저장 성공", HttpStatus.OK);
     }
 }

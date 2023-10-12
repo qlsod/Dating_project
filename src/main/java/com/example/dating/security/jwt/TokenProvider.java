@@ -1,19 +1,25 @@
 package com.example.dating.security.jwt;
 
+import com.example.dating.domain.Account;
 import com.example.dating.repository.AccountRepository;
+import com.example.dating.security.auth.PrincipalDetails;
 import com.example.dating.security.jwt.refreshtoken.RefreshToken;
 import com.example.dating.security.jwt.refreshtoken.RefreshTokenRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -34,7 +40,6 @@ public class TokenProvider {
     }
 
     public TokenInfo generateToken(Authentication authentication) {
-        System.out.println("authentication = " + authentication);
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
@@ -62,5 +67,29 @@ public class TokenProvider {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    public Authentication getAuthentication(String accessToken) {
+        Claims claims = getClaimsJws(accessToken).getBody();
+        if (claims.get("auth") == null) {
+            return null;
+        }
+        Account account = accountRepository.findByEmail(claims.getSubject()).get();
+
+        PrincipalDetails principalDetails = new PrincipalDetails(account);
+        return new UsernamePasswordAuthenticationToken(principalDetails, null, principalDetails.getAuthorities());
+    }
+
+    public boolean validateToken(String accessToken) {
+        try {
+            getClaimsJws(accessToken);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private Jws<Claims> getClaimsJws(String accessToken) {
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken);
     }
 }

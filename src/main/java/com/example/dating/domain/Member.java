@@ -1,6 +1,6 @@
 package com.example.dating.domain;
 
-import com.example.dating.dto.MemberDto;
+import com.example.dating.dto.MemberInfoDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -32,17 +32,18 @@ public class Member {
     public Member() {
     }
 
-    public void createMember(MemberDto memberDto) {
-        this.name = memberDto.getName();
-        this.age = memberDto.getAge();
-        this.gender = memberDto.getGender();
-        this.residence = memberDto.getResidence();
-        this.image = memberDto.getImage();
-        this.height = memberDto.getHeight();
-        this.mbti = memberDto.getMbti();
-        this.personality = memberDto.getPersonality();
-        this.hobby = memberDto.getHobby();
-        this.likeMbti = memberDto.getLikeMbti();
-        this.likePersonality = memberDto.getLikePersonality();
+    public void createMember(MemberInfoDto memberInfoDto, Account account) {
+        this.account = account;
+        this.name = memberInfoDto.getName();
+        this.age = memberInfoDto.getAge();
+        this.gender = memberInfoDto.getGender();
+        this.residence = memberInfoDto.getResidence();
+        this.image = memberInfoDto.getImage();
+        this.height = memberInfoDto.getHeight();
+        this.mbti = memberInfoDto.getMbti();
+        this.personality = memberInfoDto.getPersonality();
+        this.hobby = memberInfoDto.getHobby();
+        this.likeMbti = memberInfoDto.getLikeMbti();
+        this.likePersonality = memberInfoDto.getLikePersonality();
     }
 }

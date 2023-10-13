@@ -1,7 +1,7 @@
 package com.example.dating.controller;
 
-import com.example.dating.dto.HeartMemberDto;
-import com.example.dating.dto.MemberCardDto;
+import com.example.dating.dto.heart.HeartMemberDto;
+import com.example.dating.dto.member.MemberCardDto;
 import com.example.dating.security.auth.PrincipalDetails;
 import com.example.dating.service.HeartService;
 import com.example.dating.service.MemberService;

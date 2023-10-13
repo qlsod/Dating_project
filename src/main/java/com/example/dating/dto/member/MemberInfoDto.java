@@ -1,4 +1,4 @@
-package com.example.dating.dto;
+package com.example.dating.dto.member;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

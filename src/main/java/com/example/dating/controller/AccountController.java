@@ -1,6 +1,6 @@
 package com.example.dating.controller;
 
-import com.example.dating.dto.AccountDto;
+import com.example.dating.dto.account.AccountDto;
 import com.example.dating.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

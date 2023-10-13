@@ -1,6 +1,6 @@
 package com.example.dating.service;
 
-import com.example.dating.dto.AccountDto;
+import com.example.dating.dto.account.AccountDto;
 import com.example.dating.domain.Account;
 import com.example.dating.repository.AccountRepository;
 import com.example.dating.security.jwt.TokenInfo;

@@ -1,6 +1,6 @@
 package com.example.dating.domain;
 
-import com.example.dating.dto.MemberInfoDto;
+import com.example.dating.dto.member.MemberInfoDto;
 import lombok.*;
 
 import javax.persistence.*;

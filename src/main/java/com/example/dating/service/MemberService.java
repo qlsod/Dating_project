@@ -2,8 +2,8 @@ package com.example.dating.service;
 
 import com.example.dating.domain.Account;
 import com.example.dating.domain.Member;
-import com.example.dating.dto.MemberCardDto;
-import com.example.dating.dto.MemberInfoDto;
+import com.example.dating.dto.member.MemberCardDto;
+import com.example.dating.dto.member.MemberInfoDto;
 import com.example.dating.repository.AccountRepository;
 import com.example.dating.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;

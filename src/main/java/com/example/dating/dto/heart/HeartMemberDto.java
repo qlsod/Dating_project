@@ -1,4 +1,4 @@
-package com.example.dating.dto;
+package com.example.dating.dto.heart;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

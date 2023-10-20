@@ -15,7 +15,7 @@ public class GwatingRoom {
     @Column(name = "GWATINGROOM_ID")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ROOM_MANAGER_ID")
     private Member roomManager;
 

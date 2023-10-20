@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface GwatingRepository extends JpaRepository<GwatingRoom, Long> {
-    @Query("select new com.example.dating.dto.GwatingCardDto(g.id, g.roomName, g.ageCategory, g.maleCount, g.femaleCount) from GwatingRoom g where g.roomCategory = :roomCategory")
+    @Query("select new com.example.dating.dto.gwating.GwatingCardDto(g.id, g.roomName, g.ageCategory, g.maleCount, g.femaleCount) from GwatingRoom g where g.roomCategory = :roomCategory")
     List<GwatingCardDto> findAllByRoomCategory(@Param("roomCategory") String roomCategory);
 
     @Query("select g from GwatingRoom g where g.id = :id")

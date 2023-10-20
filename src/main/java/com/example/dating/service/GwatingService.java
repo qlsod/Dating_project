@@ -4,6 +4,7 @@ import com.example.dating.domain.GwatingRoom;
 import com.example.dating.domain.Member;
 import com.example.dating.dto.gwating.GwatingCardDto;
 import com.example.dating.dto.gwating.GwatingRoomDto;
+import com.example.dating.dto.member.MemberGenderDto;
 import com.example.dating.repository.GwatingRepository;
 import com.example.dating.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -46,10 +47,10 @@ public class GwatingService {
 
     @Transactional
     public void join(Long id, String email) {
-        String myGender = memberRepository.findMyGender(email);
+        MemberGenderDto memberGenderDto = memberRepository.findMyGender(email);
         GwatingRoom findRoomCard = gwatingRepository.findOneById(id);
 
-        if (myGender.equals("남자")) {
+        if (memberGenderDto.getGender().equals("남자")) {
             findRoomCard.joinMale();
         } else {
             findRoomCard.joinFemale();

@@ -13,7 +13,7 @@ public class Member {
     @Column(name = "MEMBER_ID")
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ACCOUNT_ID")
     private Account account;
 

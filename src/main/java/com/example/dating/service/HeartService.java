@@ -2,7 +2,7 @@ package com.example.dating.service;
 
 import com.example.dating.domain.Heart;
 import com.example.dating.domain.Member;
-import com.example.dating.dto.HeartMemberDto;
+import com.example.dating.dto.heart.HeartMemberDto;
 import com.example.dating.repository.HeartRepository;
 import com.example.dating.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class HeartService {
      */
     @Transactional
     public void heart(Long id, String email) throws Exception {
-        Member sendMember = heartRepository.findMyMember(email);
+        Member sendMember = memberRepository.findMyMember(email);
         Optional<Member> receiverMemberOptional = memberRepository.findById(id);
 
         if (sendMember != null && receiverMemberOptional.isPresent()) {

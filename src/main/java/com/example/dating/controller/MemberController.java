@@ -1,6 +1,6 @@
 package com.example.dating.controller;
 
-import com.example.dating.dto.MemberInfoDto;
+import com.example.dating.dto.member.MemberInfoDto;
 import com.example.dating.security.auth.PrincipalDetails;
 import com.example.dating.service.MemberService;
 import lombok.RequiredArgsConstructor;

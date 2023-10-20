@@ -14,11 +14,11 @@ public class Heart {
     @Column(name = "LIKE_ID")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SENDER_ID")
     private Member sender;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "RECEIVER_ID")
     private Member receiver;
 

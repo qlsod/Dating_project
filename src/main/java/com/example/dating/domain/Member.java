@@ -1,6 +1,6 @@
 package com.example.dating.domain;
 
-import com.example.dating.dto.MemberInfoDto;
+import com.example.dating.dto.member.MemberInfoDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -13,7 +13,7 @@ public class Member {
     @Column(name = "MEMBER_ID")
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ACCOUNT_ID")
     private Account account;
 

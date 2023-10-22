@@ -8,6 +8,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Member {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,11 +32,7 @@ public class Member {
     private String interest;
     private String likePersonality;
 
-    public Member() {
-    }
-
-    public void mapDtoToEntity(MemberInfoDto memberInfoDto, Account account) {
-        this.account = account;
+    public void mapDtoToEntity(MemberInfoDto memberInfoDto) {
         this.name = memberInfoDto.getName();
         this.comment = memberInfoDto.getComment();
         this.gender = memberInfoDto.getGender();
@@ -48,5 +45,9 @@ public class Member {
         this.personality = memberInfoDto.getPersonality();
         this.interest = memberInfoDto.getInterest();
         this.likePersonality = memberInfoDto.getLikePersonality();
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
     }
 }

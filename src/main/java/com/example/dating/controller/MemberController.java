@@ -32,4 +32,19 @@ public class MemberController {
 
         return memberService.save(principalDetails.getUsername(), memberInfoDto);
     }
+
+    @GetMapping("/member/profile")
+    public MemberInfoDto getMemberProfile(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return memberService.getMemberProfile(principalDetails.getUsername());
+    }
+
+    @PostMapping("/member/profile/update")
+    public String updateMemberProfile(@RequestBody MemberInfoDto memberInfoDto,
+                                      BindingResult bindingResult,
+                                      @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        if (bindingResult.hasErrors()) {
+            return "회원정보 수정 실패";
+        }
+        return memberService.updateMemberProfile(principalDetails.getUsername(), memberInfoDto);
+    }
 }

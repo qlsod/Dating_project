@@ -39,7 +39,8 @@ public class MemberService {
         Account account = accoutOptional.get();
 
         Member member = new Member();
-        member.mapDtoToEntity(memberInfoDto, account);
+        member.mapDtoToEntity(memberInfoDto);
+        member.setAccount(account);
 
         memberRepository.save(member);
         return "회원정보 저장 성공";
@@ -65,6 +66,35 @@ public class MemberService {
 
         PageRequest pageRequest = PageRequest.of(0, 5);
         return memberRepository.findRandomMemberbyMbtiList(partnerMbtiList, randomMemberIdList, memberMbtiDto.getId(), pageRequest);
+    }
 
+    public MemberInfoDto getMemberProfile(String email) {
+        Member member = memberRepository.findMyMember(email);
+
+        return MemberInfoDto.builder()
+                .name(member.getName())
+                .comment(member.getComment())
+                .gender(member.getGender())
+                .residence(member.getResidence())
+                .age(member.getAge())
+                .height(member.getHeight())
+                .image(member.getImage())
+                .personalInfo(member.getPersonalInfo())
+                .mbti(member.getMbti())
+                .interest(member.getInterest())
+                .personality(member.getPersonality())
+                .likePersonality(member.getLikePersonality())
+                .build();
+    }
+
+    @Transactional
+    public String updateMemberProfile(String email, MemberInfoDto memberInfoDto) {
+        try {
+            Member member = memberRepository.findMyMember(email);
+            member.mapDtoToEntity(memberInfoDto);
+        } catch (Exception e) {
+            return "회원정보 수정 실패";
+        }
+        return "회원정보 수정 성공";
     }
 }

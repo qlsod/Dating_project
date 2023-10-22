@@ -13,8 +13,8 @@ public class MemberInfoDto {
     @NotEmpty(message = "이름을 입력해주세요")
     private String name;
 
-    @NotNull(message = "나이를 입력해주세요")
-    private int age;
+    @NotEmpty(message = "한줄 소개를 입력해주세요")
+    private String comment;
 
     @NotEmpty(message = "성별을 입력해주세요")
     private String gender;
@@ -22,11 +22,17 @@ public class MemberInfoDto {
     @NotEmpty(message = "사는 곳을 입력해주세요")
     private String residence;
 
-    @NotEmpty(message = "사진을 입력해주세요")
-    private String image;
+    @NotNull(message = "나이를 입력해주세요")
+    private int age;
 
     @NotNull(message = "키를 입력해주세요")
     private int height;
+
+    @NotEmpty(message = "사진을 입력해주세요")
+    private String image;
+
+    @NotEmpty(message = "인적사항을 입력해주세요")
+    private String personalInfo;
 
     @NotEmpty(message = "mbti를 입력해주세요")
     private String mbti;
@@ -34,13 +40,10 @@ public class MemberInfoDto {
     @NotEmpty(message = "성격을 입력해주세요")
     private String personality;
 
-    @NotEmpty(message = "취미를 입력해주세요")
-    private String hobby;
+    @NotEmpty(message = "관심사를 입력해주세요")
+    private String interest;
 
-    @NotEmpty(message = "원하는 mbti를 입력해주세요")
-    private String likeMbti;
-
-    @NotEmpty(message = "원하는 성격을 입력해주세요")
+    @NotEmpty(message = "이상형을 입력해주세요")
     private String likePersonality;
 }
 

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,12 +30,19 @@ public class MemberService {
      * 입력한 회원 정보 저장
      */
     @Transactional
-    public void save(String email, MemberInfoDto memberInfoDto) {
-        Account account = accountRepository.findByEmail(email).get();
+    public String save(String email, MemberInfoDto memberInfoDto) {
+        Optional<Account> accoutOptional = accountRepository.findByEmail(email);
+
+        if (accoutOptional.isEmpty()) {
+            return "존재하지 않는 이메일입니다.";
+        }
+        Account account = accoutOptional.get();
+
         Member member = new Member();
-        member.createMember(memberInfoDto, account);
+        member.mapDtoToEntity(memberInfoDto, account);
 
         memberRepository.save(member);
+        return "회원정보 저장 성공";
     }
 
     /**

@@ -19,6 +19,6 @@ public class AlertController {
 
     @GetMapping("/alert")
     public List<AlertDto> getAlert(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        return alertService.getAlert(principalDetails.getUsername());
+        return alertService.getAlertList(principalDetails.getUsername());
     }
 }

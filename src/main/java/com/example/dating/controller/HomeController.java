@@ -4,6 +4,7 @@ import com.example.dating.dto.heart.HeartMemberDto;
 import com.example.dating.dto.member.MemberCardDto;
 import com.example.dating.dto.member.MemberMbtiDto;
 import com.example.dating.security.auth.PrincipalDetails;
+import com.example.dating.service.AlertService;
 import com.example.dating.service.HeartService;
 import com.example.dating.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +22,16 @@ public class HomeController {
 
     private final MemberService memberService;
     private final HeartService heartService;
+    private final AlertService alertService;
 
     @GetMapping({"", "/"})
-    public HashMap<String, List<?>> home(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        // 이성 회원 랜덤 20명 추천
+    public HashMap<String, Object> home(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         String email = principalDetails.getUsername();
+
+        // 회원이 확인하지 않은 알림 개수
+        long notCheckAlert = alertService.countNotCheckAlert(email);
+
+        // 이성 회원 랜덤 20명 추천
         List<MemberCardDto> randomMemberList = memberService.getRandomMemberList(email);
 
         // 내가 관심 있는 친구
@@ -37,7 +43,8 @@ public class HomeController {
         // mbti 잘 맞는 이성 회원 랜덤 5명 추천
         List<MemberMbtiDto> goodMbtiList = memberService.getGoodMbtiList(email, randomMemberList);
 
-        HashMap<String, List<?>> response = new HashMap<>();
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("notCheckAlert", notCheckAlert);
         response.put("randomMemberList", randomMemberList);
         response.put("sendHeartList", sendHeartList);
         response.put("receiverHeartList", receiverHeartList);

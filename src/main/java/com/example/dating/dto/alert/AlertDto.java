@@ -10,4 +10,5 @@ public class AlertDto {
     private String image;
     private String message;
     private String sendAt;
+    private boolean isCheck;
 }

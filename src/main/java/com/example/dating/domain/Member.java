@@ -4,9 +4,11 @@ import com.example.dating.dto.member.MemberInfoDto;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Member {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,32 +20,34 @@ public class Member {
     private Account account;
 
     private String name;
-    private Integer age;
+    private String comment;
     private String gender;
     private String residence;
-    private String image;
+    private Integer age;
     private Integer height;
+    private String image;
+    private String personalInfo;
     private String mbti;
     private String personality;
-    private String hobby;
-    private String likeMbti;
+    private String interest;
     private String likePersonality;
 
-    public Member() {
-    }
-
-    public void createMember(MemberInfoDto memberInfoDto, Account account) {
-        this.account = account;
+    public void mapDtoToEntity(MemberInfoDto memberInfoDto) {
         this.name = memberInfoDto.getName();
-        this.age = memberInfoDto.getAge();
+        this.comment = memberInfoDto.getComment();
         this.gender = memberInfoDto.getGender();
         this.residence = memberInfoDto.getResidence();
-        this.image = memberInfoDto.getImage();
+        this.age = memberInfoDto.getAge();
         this.height = memberInfoDto.getHeight();
+        this.image = memberInfoDto.getImage();
+        this.personalInfo = memberInfoDto.getPersonalInfo();
         this.mbti = memberInfoDto.getMbti();
         this.personality = memberInfoDto.getPersonality();
-        this.hobby = memberInfoDto.getHobby();
-        this.likeMbti = memberInfoDto.getLikeMbti();
+        this.interest = memberInfoDto.getInterest();
         this.likePersonality = memberInfoDto.getLikePersonality();
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
     }
 }

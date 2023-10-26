@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,12 +30,20 @@ public class MemberService {
      * 입력한 회원 정보 저장
      */
     @Transactional
-    public void save(String email, MemberInfoDto memberInfoDto) {
-        Account account = accountRepository.findByEmail(email).get();
+    public String save(String email, MemberInfoDto memberInfoDto) {
+        Optional<Account> accoutOptional = accountRepository.findByEmail(email);
+
+        if (accoutOptional.isEmpty()) {
+            return "존재하지 않는 이메일입니다.";
+        }
+        Account account = accoutOptional.get();
+
         Member member = new Member();
-        member.createMember(memberInfoDto, account);
+        member.mapDtoToEntity(memberInfoDto);
+        member.setAccount(account);
 
         memberRepository.save(member);
+        return "회원정보 저장 성공";
     }
 
     /**
@@ -57,6 +66,35 @@ public class MemberService {
 
         PageRequest pageRequest = PageRequest.of(0, 5);
         return memberRepository.findRandomMemberbyMbtiList(partnerMbtiList, randomMemberIdList, memberMbtiDto.getId(), pageRequest);
+    }
 
+    public MemberInfoDto getMemberProfile(String email) {
+        Member member = memberRepository.findMyMember(email);
+
+        return MemberInfoDto.builder()
+                .name(member.getName())
+                .comment(member.getComment())
+                .gender(member.getGender())
+                .residence(member.getResidence())
+                .age(member.getAge())
+                .height(member.getHeight())
+                .image(member.getImage())
+                .personalInfo(member.getPersonalInfo())
+                .mbti(member.getMbti())
+                .interest(member.getInterest())
+                .personality(member.getPersonality())
+                .likePersonality(member.getLikePersonality())
+                .build();
+    }
+
+    @Transactional
+    public String updateMemberProfile(String email, MemberInfoDto memberInfoDto) {
+        try {
+            Member member = memberRepository.findMyMember(email);
+            member.mapDtoToEntity(memberInfoDto);
+        } catch (Exception e) {
+            return "회원정보 수정 실패";
+        }
+        return "회원정보 수정 성공";
     }
 }

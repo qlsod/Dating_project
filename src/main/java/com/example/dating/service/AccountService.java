@@ -24,17 +24,13 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
-    private final ObjectMapper mapper;
 
-    /**
-     * 중복 회원이 있는지 체크
-     * 검증 후 회원가입
-     */
     @Transactional
     public Account join(AccountDto accountDto) {
+        // 이메일로 회원 찾기
         Optional<Account> findAccount = accountRepository.findByEmail(accountDto.getEmail());
 
-        if (findAccount.isEmpty()) {
+        if (findAccount.isEmpty()) { // 존재하는 회원이 없다면 회원가입 시작
             String encodePassword = passwordEncoder.encode(accountDto.getPassword());
 
             Account account = Account.builder()
@@ -48,40 +44,23 @@ public class AccountService {
         return null;
     }
 
-    /**
-     * 가입된 회원인지 체크
-     * 패스워드가 일치하는지 체크
-     * 검증 후 TokenInfo 객체를 JSON 으로 변환
-     */
     @Transactional
-    public ResponseEntity<String> login(AccountDto accountDto) {
+    public Object login(AccountDto accountDto) throws Exception {
+        // 이메일로 회원 찾기
         Optional<Account> findAccount = accountRepository.findByEmail(accountDto.getEmail());
-        if (findAccount.isEmpty()) {
-            return null;
+        if (findAccount.isEmpty()) { // 회원이 존재하지 않으면 잘못된 이메일
+            throw new Exception("존재하는 회원이 없습니다.");
         }
 
         Account account = findAccount.get();
+
+        // 복호화한 패스워드와 입력한 패스워드가 다르면 틀린 비밀번호
         if (!passwordEncoder.matches(accountDto.getPassword(), account.getPassword())) {
-            return null;
+            throw new Exception("비밀번호가 일치하지 않습니다.");
         }
 
+        // jwt 발급
         Authentication token = new UsernamePasswordAuthenticationToken(account.getEmail(), account.getPassword());
-        TokenInfo jwt = tokenProvider.generateToken(token);
-
-        return getResponseEntity(jwt);
-    }
-
-    private ResponseEntity<String> getResponseEntity(TokenInfo jwt) {
-        try {
-            String jsonJwt;
-            jsonJwt = mapper.writeValueAsString(jwt);
-            return ResponseEntity.ok(jsonJwt);
-        }
-        catch (NullPointerException e) {
-            return ResponseEntity.badRequest().body("이메일 혹은 패스워드가 일치하지 않습니다.");
-        }
-        catch (JsonProcessingException e) {
-            return ResponseEntity.badRequest().body("JSON 변환 중에 오류가 발생했습니다.");
-        }
+        return tokenProvider.generateToken(token);
     }
 }

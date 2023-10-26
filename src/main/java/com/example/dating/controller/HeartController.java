@@ -16,11 +16,6 @@ public class HeartController {
 
     @PostMapping("/heart/add")
     public String heart(@RequestParam Long id, @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        try {
-            heartService.heart(id, principalDetails.getUsername());
-        } catch (Exception e) {
-            return "알 수 없는 오류가 발생했습니다.";
-        }
-        return "정상 처리";
+        return heartService.heart(id, principalDetails.getUsername());
     }
 }

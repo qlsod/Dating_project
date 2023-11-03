@@ -1,10 +1,7 @@
 package com.example.dating.dto.member;
 
 import com.example.dating.domain.Member;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -48,20 +45,19 @@ public class MemberInfoDto {
     @NotEmpty(message = "이상형을 입력해주세요")
     private String likePersonality;
 
-    @Builder
-    public MemberInfoDto(String name, String comment, String gender, String residence, int age, int height, String image, String personalInfo, String mbti, String personality, String interest, String likePersonality) {
-        this.name = name;
-        this.comment = comment;
-        this.gender = gender;
-        this.residence = residence;
-        this.age = age;
-        this.height = height;
-        this.image = image;
-        this.personalInfo = personalInfo;
-        this.mbti = mbti;
-        this.personality = personality;
-        this.interest = interest;
-        this.likePersonality = likePersonality;
+    public void mapEntityToDto(Member member) {
+        this.name = member.getName();
+        this.comment = member.getComment();
+        this.gender = member.getGender();
+        this.residence = member.getResidence();
+        this.age = member.getAge();
+        this.height = member.getHeight();
+        this.image = member.getImage();
+        this.personalInfo = member.getPersonalInfo();
+        this.mbti = member.getMbti();
+        this.personality = member.getPersonality();
+        this.interest = member.getInterest();
+        this.likePersonality = member.getLikePersonality();
     }
 }
 

@@ -1,6 +1,6 @@
 package com.example.dating.security.auth;
 
-import com.example.dating.domain.Account;
+import com.example.dating.domain.Member;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,10 +12,10 @@ import java.util.Collection;
 
 public class PrincipalDetails implements UserDetails {
 
-    private Account account;
+    private Member member;
 
-    public PrincipalDetails(Account account) {
-        this.account = account;
+    public PrincipalDetails(Member member) {
+        this.member = member;
     }
 
     @Override
@@ -27,12 +27,12 @@ public class PrincipalDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return account.getPassword();
+        return member.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return account.getEmail();
+        return member.getEmail();
     }
 
     @Override

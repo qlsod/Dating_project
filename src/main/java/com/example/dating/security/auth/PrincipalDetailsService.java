@@ -1,7 +1,7 @@
 package com.example.dating.security.auth;
 
-import com.example.dating.domain.Account;
-import com.example.dating.repository.AccountRepository;
+import com.example.dating.domain.Member;
+import com.example.dating.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,13 +14,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PrincipalDetailsService implements UserDetailsService {
 
-    private final AccountRepository accountRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        System.out.println("loadUserByUsername");
-        Optional<Account> findAccount = accountRepository.findByEmail(email);
-        return findAccount.map(PrincipalDetails::new).orElse(null);
+        Optional<Member> memberOptional = memberRepository.findByEmail(email);
+        return memberOptional.map(PrincipalDetails::new).orElse(null);
     }
 }
 

@@ -1,7 +1,7 @@
 package com.example.dating.security.jwt;
 
-import com.example.dating.domain.Account;
-import com.example.dating.repository.AccountRepository;
+import com.example.dating.domain.Member;
+import com.example.dating.repository.MemberRepository;
 import com.example.dating.security.auth.PrincipalDetails;
 import com.example.dating.security.jwt.refreshtoken.RefreshToken;
 import com.example.dating.security.jwt.refreshtoken.RefreshTokenRepository;
@@ -19,23 +19,22 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
 public class TokenProvider {
 
     private final Key key;
-    private final AccountRepository accountRepository;
+    private final MemberRepository memberRepository;
     private final RefreshTokenRepository refreshTokenRepository;
 
 
     public TokenProvider(@Value("${jwt.secret}") String secretKey,
-                         AccountRepository accountRepository,
+                         MemberRepository memberRepository,
                          RefreshTokenRepository refreshTokenRepository) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
-        this.accountRepository = accountRepository;
+        this.memberRepository = memberRepository;
         this.refreshTokenRepository = refreshTokenRepository;
     }
 
@@ -74,9 +73,9 @@ public class TokenProvider {
         if (claims.get("auth") == null) {
             return null;
         }
-        Account account = accountRepository.findByEmail(claims.getSubject()).get();
+        Member member = memberRepository.findByEmail(claims.getSubject()).get();
 
-        PrincipalDetails principalDetails = new PrincipalDetails(account);
+        PrincipalDetails principalDetails = new PrincipalDetails(member);
         return new UsernamePasswordAuthenticationToken(principalDetails, null, principalDetails.getAuthorities());
     }
 

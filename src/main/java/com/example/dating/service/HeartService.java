@@ -29,15 +29,14 @@ public class HeartService {
      */
     @Transactional
     public String heart(Long id, String email) {
-        Member sendMember = memberRepository.findMyMember(email);
+        Member sendMember = memberRepository.findByEmail(email).get();
         Optional<Member> receiverMemberOptional = memberRepository.findById(id);
 
-        if (sendMember == null || receiverMemberOptional.isEmpty()) {
+        if (receiverMemberOptional.isEmpty()) {
             return "존재하지 않는 회원입니다.";
         }
 
         Member receiverMember = receiverMemberOptional.get();
-
         if (heartRepository.countBySenderAndReceiver(sendMember, receiverMember) != 0) {
             return "이미 하트를 보낸 회원입니다.";
         }

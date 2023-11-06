@@ -9,16 +9,14 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Member {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MEMBER_ID")
     private Long id;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ACCOUNT_ID")
-    private Account account;
-
+    private String email;
+    private String password;
     private String name;
     private String comment;
     private String gender;
@@ -47,7 +45,8 @@ public class Member {
         this.likePersonality = memberInfoDto.getLikePersonality();
     }
 
-    public void setAccount(Account account) {
-        this.account = account;
+    public Member(String email, String password) {
+        this.email = email;
+        this.password = password;
     }
 }

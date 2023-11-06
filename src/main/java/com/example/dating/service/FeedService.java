@@ -26,14 +26,15 @@ public class FeedService {
 
     @Transactional
     public void post(String email, FeedDto feedDto) throws Exception {
-        Member myMember = memberRepository.findMyMember(email);
+        Optional<Member> memberOptional = memberRepository.findByEmail(email);
 
-        if (myMember == null) {
+        if (memberOptional.isEmpty()) {
             throw new Exception();
         }
+        Member member = memberOptional.get();
 
         Feed feed = new Feed();
-        feed.DtoToEntity(myMember, feedDto);
+        feed.DtoToEntity(member, feedDto);
 
         feedRepository.save(feed);
     }
@@ -47,7 +48,7 @@ public class FeedService {
         Optional<Feed> feedOptional = feedRepository.findById(feedActionDto.getFeedId());
 
         feedOptional.ifPresentOrElse(feed -> {
-            Member myMember = memberRepository.findMyMember(email);
+            Member myMember = memberRepository.findByEmail(email).get();
             cntPlusAndSaveEntity(actionName, feed, myMember, feedActionDto.getContent());
         }, () -> {
             throw new EntityNotFoundException("존재하지 않는 피드입니다.");

@@ -1,12 +1,18 @@
 package com.example.dating.domain;
 
+import com.example.dating.dto.feed.FeedDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
 public class Feed {
 
@@ -25,6 +31,14 @@ public class Feed {
     private Integer feedLike;
     private Integer feedBookmark;
 
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
+
+    // 테스트 용 생성자
     public Feed(Member member, String image, String content, String hashTag, Integer feedComment, Integer feedLike, Integer feedBookmark) {
         this.member = member;
         this.image = image;
@@ -33,6 +47,16 @@ public class Feed {
         this.feedComment = feedComment;
         this.feedLike = feedLike;
         this.feedBookmark = feedBookmark;
+    }
+
+    public void DtoToEntity(Member member, FeedDto feedDto) {
+        this.member = member;
+        this.image = feedDto.getFeedImage();
+        this.content = feedDto.getContent();
+        this.hashTag = feedDto.getHashTag();
+        this.feedComment = 0;
+        this.feedLike = 0;
+        this.feedBookmark = 0;
     }
 
     public void addComment() {

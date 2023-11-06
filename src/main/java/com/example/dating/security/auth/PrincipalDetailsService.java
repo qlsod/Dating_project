@@ -18,9 +18,8 @@ public class PrincipalDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        System.out.println("loadUserByUsername");
-        Optional<Member> findAccount = memberRepository.findByEmail(email);
-        return findAccount.map(PrincipalDetails::new).orElse(null);
+        Optional<Member> memberOptional = memberRepository.findByEmail(email);
+        return memberOptional.map(PrincipalDetails::new).orElse(null);
     }
 }
 

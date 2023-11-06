@@ -21,8 +21,7 @@ public class GwatingService {
     private final MemberRepository memberRepository;
 
     public List<GwatingCardDto> findRoomList(String roomCategory) {
-        List<GwatingCardDto> roomList = gwatingRepository.findAllByRoomCategory(roomCategory);
-        return roomList;
+        return gwatingRepository.findAllByRoomCategory(roomCategory);
     }
 
     public String create(GwatingRoomDto gwatingRoomDto, String email) {
@@ -35,11 +34,10 @@ public class GwatingService {
             return "인원수는 짝수로 입력해주세요.";
         }
 
-        Member myMember = memberRepository.findMyMember(email);
+        Member findMember = memberRepository.findByEmail(email).get();
 
         GwatingRoom gwatingRoom = new GwatingRoom();
-        gwatingRoom.createGwatingRoom(gwatingRoomDto, myMember);
-
+        gwatingRoom.createGwatingRoom(gwatingRoomDto, findMember);
         gwatingRepository.save(gwatingRoom);
 
         return "과팅방 생성 완료";
@@ -47,10 +45,10 @@ public class GwatingService {
 
     @Transactional
     public void join(Long id, String email) {
-        MemberGenderDto memberGenderDto = memberRepository.findMyGender(email);
+        Member findMember = memberRepository.findByEmail(email).get();
         GwatingRoom findRoomCard = gwatingRepository.findOneById(id);
 
-        if (memberGenderDto.getGender().equals("남자")) {
+        if (findMember.getGender().equals("남자")) {
             findRoomCard.joinMale();
         } else {
             findRoomCard.joinFemale();

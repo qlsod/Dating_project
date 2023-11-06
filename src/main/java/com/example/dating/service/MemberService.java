@@ -74,53 +74,39 @@ public class MemberService {
     /**
      * 20명의 랜덤 이성 회원을 추천
      */
-    public List<MemberCardDto> getRandomMemberList(String email) throws Exception {
-        Optional<Member> memberOptional = memberRepository.findByEmail(email);
+    public List<MemberCardDto> getRandomMemberList(String email) {
+        Member findMember = memberRepository.findByEmail(email).get();
 
-        if (memberOptional.isEmpty()) {
-            throw new Exception("회원이 존재하지 않습니다.");
-        }
-        Member member = memberOptional.get();
         PageRequest pageRequest = PageRequest.of(0, 20);
-        return memberRepository.findRandomMember(member.getId(), member.getGender(), pageRequest);
+        return memberRepository.findRandomMember(findMember.getId(), findMember.getGender(), pageRequest);
     }
 
     /**
      * 나와 잘 맞는 mbti를 가진 5명의 이성 회원을 추천
      */
-    public List<MemberMbtiDto> getGoodMbtiList(String email, List<MemberCardDto> randomMemberList) throws Exception {
-        Optional<Member> memberOptional = memberRepository.findByEmail(email);
-        if (memberOptional.isEmpty()) {
-            throw new Exception("회원이 존재하지 않습니다.");
-        }
+    public List<MemberMbtiDto> getGoodMbtiList(String email, List<MemberCardDto> randomMemberList) {
+        Member findMember = memberRepository.findByEmail(email).get();
 
-        Member member = memberOptional.get();
-        List<String> partnerMbtiList = Mbti.getGoodPartner(member.getMbti());
+        List<String> partnerMbtiList = Mbti.getGoodPartner(findMember.getMbti());
 
         List<Long> randomMemberIdList = randomMemberList.stream().map(MemberCardDto::getId).collect(Collectors.toList());
 
         PageRequest pageRequest = PageRequest.of(0, 5);
-        return memberRepository.findRandomMemberbyMbtiList(partnerMbtiList, randomMemberIdList, member.getId(), pageRequest);
+        return memberRepository.findRandomMemberbyMbtiList(partnerMbtiList, randomMemberIdList, findMember.getId(), pageRequest);
     }
 
-    public MemberInfoDto getMemberProfile(String email) throws Exception {
-        Optional<Member> memberOptional = memberRepository.findByEmail(email);
-        if (memberOptional.isEmpty()) {
-            throw new Exception("회원이 존재하지 않습니다.");
-        }
-
-        Member member = memberOptional.get();
+    public MemberInfoDto getMemberProfile(String email) {
+        Member findMember = memberRepository.findByEmail(email).get();
 
         MemberInfoDto memberInfoDto = new MemberInfoDto();
-        memberInfoDto.mapEntityToDto(member);
+        memberInfoDto.mapEntityToDto(findMember);
         return memberInfoDto;
     }
 
     @Transactional
     public void updateMemberProfile(String email, MemberInfoDto memberInfoDto) {
-        Optional<Member> memberOptional = memberRepository.findByEmail(email);
+        Member findMember = memberRepository.findByEmail(email).get();
 
-        memberOptional.ifPresentOrElse(member -> member.mapDtoToEntity(memberInfoDto),
-                () -> { throw new RuntimeException("회원이 존재하지 않습니다."); });
+        findMember.mapDtoToEntity(memberInfoDto);
     }
 }

@@ -11,9 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 class FeedTest {
 
     @Autowired
-    private AccountRepository accountRepository;
-
-    @Autowired
     private MemberRepository memberRepository;
 
     @Autowired
@@ -30,20 +27,15 @@ class FeedTest {
 
     @BeforeEach
     void before() {
-        Account account1 = new Account("test1@test.com", "test1234");
-        Account account2 = new Account("test2@test.com", "test1234");
-        accountRepository.save(account1);
-        accountRepository.save(account2);
+        Member member1 = new Member(1L,"test@test.com", "test1234",
+                "김포로", "진지한 만남 원해요!", "남자", "서울 강서구",
+                24, 183, "이미지 경로", "전문대,학생,쿨한",
+                "ENTP", "털털한,착한,열정적인", "LOL,코딩,K-POP,전시회", "털털한,착한,겁많은");
 
-        Member member1 = new Member(account1, "김포로", "진지한 만남 원해요!",
-                "남자", "서울 강서구", 24, 183, "이미지 경로",
-                "전문대,학생,쿨한", "ENTP", "털털한,착한,열정적인",
-                "LOL,코딩,K-POP,전시회", "털털한,착한,겁많은");
-
-        Member member2 = new Member(account2, "김로포", "진지한 만남 원해요!",
-                "여자", "서울 동대문구", 28, 162, "이미지 경로",
-                "전문대,학생,쿨한", "ENTP", "털털한,착한,열정적인",
-                "LOL,코딩,K-POP,전시회", "털털한,착한,겁많은");
+        Member member2 = new Member(2L, "test@test.com", "test1234",
+                "김로포", "진지한 만남 원해요!", "여자", "서울 동대문구",
+                28, 162, "이미지 경로", "전문대,학생,쿨한",
+                "ENTP", "털털한,착한,열정적인", "LOL,코딩,K-POP,전시회", "털털한,착한,겁많은");
         memberRepository.save(member1);
         memberRepository.save(member2);
 
@@ -53,7 +45,7 @@ class FeedTest {
 
     @Test
     void 피드전체조회() {
-        int size = feedRepository.findFeeds().size();
+        int size = feedRepository.findAll().size();
         Assertions.assertThat(size).isEqualTo(1);
     }
 

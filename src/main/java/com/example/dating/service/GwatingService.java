@@ -24,14 +24,14 @@ public class GwatingService {
         return gwatingRepository.findAllByRoomCategory(roomCategory);
     }
 
-    public String create(GwatingRoomDto gwatingRoomDto, String email) {
+    public void create(GwatingRoomDto gwatingRoomDto, String email) throws Exception {
         Integer count = gwatingRoomDto.getAllCount();
         if (count == 0) {
-            return "인원수는 최소 1명 이상입니다.";
+            throw new Exception("인원수는 최소 1명 이상입니다.");
         }
 
         if (count % 2 != 0) {
-            return "인원수는 짝수로 입력해주세요.";
+            throw new Exception("인원수는 짝수로 입력해주세요.");
         }
 
         Member findMember = memberRepository.findByEmail(email).get();
@@ -39,8 +39,6 @@ public class GwatingService {
         GwatingRoom gwatingRoom = new GwatingRoom();
         gwatingRoom.createGwatingRoom(gwatingRoomDto, findMember);
         gwatingRepository.save(gwatingRoom);
-
-        return "과팅방 생성 완료";
     }
 
     @Transactional

@@ -4,6 +4,8 @@ import com.example.dating.domain.Alert;
 import com.example.dating.domain.Heart;
 import com.example.dating.domain.Member;
 import com.example.dating.dto.heart.HeartMemberDto;
+import com.example.dating.exception.DuplicateDataException;
+import com.example.dating.exception.EntityNotFoundException;
 import com.example.dating.repository.AlertRepository;
 import com.example.dating.repository.HeartRepository;
 import com.example.dating.repository.MemberRepository;
@@ -27,19 +29,18 @@ public class HeartService {
     /**
      * 하트를 보낸 사람과 받은 사람을 저장
      */
-    @Transactional
-    public String heart(Long id, String email) {
+    @Transactional(rollbackFor = {EntityNotFoundException.class, DuplicateDataException.class})
+    public void heart(Long id, String email) {
         Member sendMember = memberRepository.findByEmail(email).get();
         Optional<Member> receiverMemberOptional = memberRepository.findById(id);
 
-        if (receiverMemberOptional.isEmpty()) {
-            return "존재하지 않는 회원입니다.";
-        }
+        receiverMemberOptional.ifPresent(receiverMember -> {
+            if (heartRepository.countBySenderAndReceiver(sendMember, receiverMember) != 0) {
+                throw new DuplicateDataException("이미 하트를 보낸 회원입니다.");
+            }
+        });
 
         Member receiverMember = receiverMemberOptional.get();
-        if (heartRepository.countBySenderAndReceiver(sendMember, receiverMember) != 0) {
-            return "이미 하트를 보낸 회원입니다.";
-        }
 
         Heart heart = new Heart(sendMember, receiverMember);
         heartRepository.save(heart);
@@ -55,7 +56,6 @@ public class HeartService {
                 .build();
 
         alertRepository.save(alert);
-        return "하트 보내기 성공";
     }
 
     /**

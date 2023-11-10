@@ -28,9 +28,12 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests(authorize ->
                         authorize
-//                                .antMatchers("/member/join").permitAll()
-//                                .antMatchers("/member/login").permitAll()
-                                .anyRequest().permitAll())
+                                .antMatchers("/member/join").permitAll()
+                                .antMatchers("/member/login").permitAll()
+                                .antMatchers("/member/profile/save").permitAll()
+                                .antMatchers("/gwating/list").permitAll()
+                                .antMatchers("/feed/list").permitAll()
+                                .anyRequest().authenticated())
                 .addFilterBefore(new JwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

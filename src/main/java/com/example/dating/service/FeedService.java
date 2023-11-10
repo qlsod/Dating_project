@@ -44,7 +44,7 @@ public class FeedService {
     }
 
     @Transactional
-    public void performAction(FeedActionDto feedActionDto, String email, String actionName) throws EntityNotFoundException {
+    public void performAction(FeedActionDto feedActionDto, String email, String actionName) {
         Optional<Feed> feedOptional = feedRepository.findById(feedActionDto.getFeedId());
 
         feedOptional.ifPresentOrElse(feed -> {

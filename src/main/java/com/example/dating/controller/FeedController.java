@@ -15,7 +15,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,21 +27,24 @@ public class FeedController {
     private final FeedService feedService;
 
     @PostMapping("/post")
-    public ResponseEntity<String> postFeed(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                           @Validated @RequestBody FeedDto feedDto,
-                                           BindingResult bindingResult) {
+    public ResponseEntity<Map<String, String>> postFeed(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                                        @Validated @RequestBody FeedDto feedDto,
+                                                        BindingResult bindingResult) {
+
+        HashMap<String, String> response = new HashMap<>();
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(bindingResult.getFieldError().getDefaultMessage());
+            response.put("errorMessage", bindingResult.getFieldError().getDefaultMessage());
+            return ResponseEntity.badRequest().body(response);
         }
 
         try {
             feedService.post(principalDetails.getUsername(), feedDto);
-            return ResponseEntity.ok("피드 올리기에 성공했습니다.");
-        } catch (DataAccessException e) {
-            return ResponseEntity.internalServerError().body("데이터베이스 오류로 피드를 올릴 수 없습니다.");
+            response.put("successMessage", "피드 올리기에 성공했습니다.");
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("피드 올리기에 실패했습니다.");
+            response.put("errorMessage", "피드 올리기에 실패했습니다.");
+            return ResponseEntity.badRequest().body(response);
         }
     }
 
@@ -49,7 +54,9 @@ public class FeedController {
             List<FeedCardDto> list = feedService.getList();
             return ResponseEntity.ok(list);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("피드 불러오기에 실패했습니다.");
+            HashMap<String, String> response = new HashMap<>();
+            response.put("errorMessage", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
         }
     }
 
@@ -59,36 +66,41 @@ public class FeedController {
             List<FeedCommentDto> commentList = feedService.getCommentList(feedId);
             return ResponseEntity.ok(commentList);
         }  catch (EntityNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            HashMap<String, String> response = new HashMap<>();
+            response.put("errorMessage", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
         }
     }
 
     @PostMapping("/comment")
-    public ResponseEntity<String> postComment(@RequestBody FeedActionDto feedLikeDto,
+    public ResponseEntity<Map<String, String>> postComment(@RequestBody FeedActionDto feedLikeDto,
                                               @AuthenticationPrincipal PrincipalDetails principalDetails) {
         return clickAction(feedLikeDto, principalDetails, "댓글");
     }
 
     @PostMapping("/like")
-    public ResponseEntity<String> clickLike(@RequestBody FeedActionDto feedLikeDto,
+    public ResponseEntity<Map<String, String>> clickLike(@RequestBody FeedActionDto feedLikeDto,
                                             @AuthenticationPrincipal PrincipalDetails principalDetails) {
         return clickAction(feedLikeDto, principalDetails, "좋아요");
     }
 
     @PostMapping("/bookmark")
-    public ResponseEntity<String> clickBookmark(@RequestBody FeedActionDto feedBookmarkDto,
+    public ResponseEntity<Map<String, String>> clickBookmark(@RequestBody FeedActionDto feedBookmarkDto,
                                                 @AuthenticationPrincipal PrincipalDetails principalDetails) {
        return clickAction(feedBookmarkDto, principalDetails, "북마크");
     }
 
-    private ResponseEntity<String> clickAction(FeedActionDto feedActionDto,
+    private ResponseEntity<Map<String, String>> clickAction(FeedActionDto feedActionDto,
                                                PrincipalDetails principalDetails,
                                                String actionName) {
+        HashMap<String, String> response = new HashMap<>();
         try {
             feedService.performAction(feedActionDto, principalDetails.getUsername(), actionName);
-            return ResponseEntity.ok(actionName + " 성공");
+            response.put("successMessage", actionName + " 성공");
+            return ResponseEntity.ok(response);
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            response.put("errorMessage", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
         }
     }
 }

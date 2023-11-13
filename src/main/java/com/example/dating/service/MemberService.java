@@ -1,6 +1,7 @@
 package com.example.dating.service;
 
 import com.example.dating.domain.Member;
+import com.example.dating.dto.email.EmailDto;
 import com.example.dating.dto.member.*;
 import com.example.dating.mbti.Mbti;
 import com.example.dating.repository.MemberRepository;
@@ -108,5 +109,12 @@ public class MemberService {
         Member findMember = memberRepository.findByEmail(email).get();
 
         findMember.mapDtoToEntity(memberInfoDto);
+    }
+
+    @Transactional
+    public void updatePassword(EmailDto emailDto) {
+        Member member = memberRepository.findByEmail(emailDto.getEmail()).get();
+        String encodePassword = passwordEncoder.encode(emailDto.getPassword());
+        member.updatePassword(encodePassword);
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.security.Key;
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -44,10 +45,8 @@ public class TokenProvider {
                 .collect(Collectors.joining(","));
 
         long now = (new Date()).getTime();
-//        Date accessTokenExpiresIn = new Date(now + 1000 * 60 * 30);
-        Date accessTokenExpiresIn = new Date(now + 1000 * 10);
-//        Date refreshTokenExpiresIn = new Date(now + 1000 * 60 * 60 * 24 * 14);
-        Date refreshTokenExpiresIn = new Date(now + 1000 * 60 * 5);
+        Date accessTokenExpiresIn = new Date(now + 1000 * 60 * 30);
+        Date refreshTokenExpiresIn = new Date(now + 1000 * 60 * 60 * 24 * 14);
 
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
@@ -68,14 +67,13 @@ public class TokenProvider {
                 .build();
     }
 
-    public String createAccessToken(Authentication authentication) {
+    public String createAccessToken(Authentication authentication, HttpServletResponse response) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
         long now = (new Date()).getTime();
-//        Date accessTokenExpiresIn = new Date(now + 1000 * 60 * 30);
-        Date accessTokenExpiresIn = new Date(now + 1000 * 10);
+        Date accessTokenExpiresIn = new Date(now + 1000 * 60 * 30);
 
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
@@ -83,6 +81,8 @@ public class TokenProvider {
                 .setExpiration(accessTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+
+        this.setHeaderAccessToken(response, accessToken);
 
         return accessToken;
     }
@@ -106,6 +106,11 @@ public class TokenProvider {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    // 엑세스 토큰 헤더 설정
+    public void setHeaderAccessToken(HttpServletResponse response, String accessToken) {
+        response.setHeader("Authorization", "Bearer "+ accessToken);
     }
 
     // 헤더에서 AccessToken 값을 get

@@ -12,6 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
         // 헤더에서 JWT 를 get
         String accessToken = tokenProvider.resolveAccessToken(httpServletRequest);
@@ -41,7 +43,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                     //재발급 후, 컨텍스트에 다시 넣기
                     String password = tokenProvider.getUserPassword(email);
                     Authentication token = new UsernamePasswordAuthenticationToken(email, password);
-                    String newAccessToken = tokenProvider.createAccessToken(token);
+                    String newAccessToken = tokenProvider.createAccessToken(token, httpServletResponse);
                     this.setAuthentication(newAccessToken);
                 }
             }

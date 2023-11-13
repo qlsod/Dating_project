@@ -2,6 +2,7 @@ package com.example.dating.security.filter;
 
 import com.example.dating.security.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
@@ -12,6 +13,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends GenericFilterBean {
@@ -21,15 +23,35 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-        String bearerToken = httpServletRequest.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            String accessToken = bearerToken.replace("Bearer ", "");
 
+        // 헤더에서 JWT 를 get
+        String accessToken = tokenProvider.resolveAccessToken(httpServletRequest);
+        String refreshToken = tokenProvider.resolveRefreshToken(httpServletRequest);
+
+        // 유효한 토큰인지 확인
+        if (accessToken != null) {
             if (tokenProvider.validateToken(accessToken)) {
-                Authentication authentication = tokenProvider.getAuthentication(accessToken);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                this.setAuthentication(accessToken);
+            }
+            // AccessToken 이 만료되고 RefreshToken 은 존재하면
+            else if (!tokenProvider.validateToken(accessToken) && refreshToken != null) {
+                String email = tokenProvider.getUserEmail(refreshToken);
+                // RefreshToken 이 만료되지 않았다면 (만료되지 않으면 email 값을 가져오고, 만료되면 null 값을 가져옴)
+                if (email != null) {
+                    //재발급 후, 컨텍스트에 다시 넣기
+                    String password = tokenProvider.getUserPassword(email);
+                    Authentication token = new UsernamePasswordAuthenticationToken(email, password);
+                    String newAccessToken = tokenProvider.createAccessToken(token);
+                    this.setAuthentication(newAccessToken);
+                }
             }
         }
         chain.doFilter(request, response);
+    }
+
+    // SecurityContext 에 Authentication 객체를 저장
+    public void setAuthentication(String token) {
+        Authentication authentication = tokenProvider.getAuthentication(token);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

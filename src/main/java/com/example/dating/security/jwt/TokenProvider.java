@@ -1,10 +1,9 @@
 package com.example.dating.security.jwt;
 
+import com.example.dating.redis.service.RedisService;
 import com.example.dating.domain.Member;
 import com.example.dating.repository.MemberRepository;
 import com.example.dating.security.auth.PrincipalDetails;
-import com.example.dating.security.jwt.refreshtoken.RefreshToken;
-import com.example.dating.security.jwt.refreshtoken.RefreshTokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -17,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -26,16 +26,16 @@ public class TokenProvider {
 
     private final Key key;
     private final MemberRepository memberRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RedisService redisService;
 
 
     public TokenProvider(@Value("${jwt.secret}") String secretKey,
                          MemberRepository memberRepository,
-                         RefreshTokenRepository refreshTokenRepository) {
+                         RedisService redisService) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.memberRepository = memberRepository;
-        this.refreshTokenRepository = refreshTokenRepository;
+        this.redisService = redisService;
     }
 
     public TokenInfo generateToken(Authentication authentication) {
@@ -44,8 +44,10 @@ public class TokenProvider {
                 .collect(Collectors.joining(","));
 
         long now = (new Date()).getTime();
-        Date accessTokenExpiresIn = new Date(now + 1000 * 60 * 30);
-        Date refreshTokenExpiresIn = new Date(now + 1000 * 60 * 60 * 24 * 14);
+//        Date accessTokenExpiresIn = new Date(now + 1000 * 60 * 30);
+        Date accessTokenExpiresIn = new Date(now + 1000 * 10);
+//        Date refreshTokenExpiresIn = new Date(now + 1000 * 60 * 60 * 24 * 14);
+        Date refreshTokenExpiresIn = new Date(now + 1000 * 60 * 5);
 
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
@@ -59,13 +61,30 @@ public class TokenProvider {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
-        refreshTokenRepository.save(new RefreshToken(refreshToken, authentication.getName()));
-
         return TokenInfo.builder()
                 .grantType("Bearer ")
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    public String createAccessToken(Authentication authentication) {
+        String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        long now = (new Date()).getTime();
+//        Date accessTokenExpiresIn = new Date(now + 1000 * 60 * 30);
+        Date accessTokenExpiresIn = new Date(now + 1000 * 10);
+
+        String accessToken = Jwts.builder()
+                .setSubject(authentication.getName())
+                .claim("auth", authorities)
+                .setExpiration(accessTokenExpiresIn)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+        return accessToken;
     }
 
     public Authentication getAuthentication(String accessToken) {
@@ -81,14 +100,42 @@ public class TokenProvider {
 
     public boolean validateToken(String accessToken) {
         try {
-            getClaimsJws(accessToken);
-            return true;
+            Jws<Claims> claims = getClaimsJws(accessToken);
+            // 엑세스 토큰 만료기한이 현재 날짜 이전이 아니면 통과
+            return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
         }
     }
 
+    // 헤더에서 AccessToken 값을 get
+    public String resolveAccessToken(HttpServletRequest request) {
+        return getToken(request, "Authorization");
+    }
+
+    // 헤더에서 RefreshToken 값을 get
+    public String resolveRefreshToken(HttpServletRequest request) {
+        return getToken(request, "RefreshToken");
+    }
+
+    // RefreshToken 으로 email get
+    public String getUserEmail(String refreshToken) {
+        return redisService.getValues(refreshToken);
+    }
+
+    // email 로 password get
+    public String getUserPassword(String email) {
+        return memberRepository.findByEmail(email).get().getEmail();
+    }
+
     private Jws<Claims> getClaimsJws(String accessToken) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken);
+    }
+
+    private String getToken(HttpServletRequest request, String header) {
+        if(request.getHeader(header) != null) {
+            return request.getHeader(header).substring(7);
+        }
+        return null;
     }
 }

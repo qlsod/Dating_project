@@ -1,11 +1,11 @@
 package com.example.dating.controller;
 
+import com.example.dating.redis.service.RedisService;
 import com.example.dating.dto.member.MemberJoinDto;
 import com.example.dating.dto.member.MemberInfoDto;
 import com.example.dating.security.auth.PrincipalDetails;
 import com.example.dating.security.jwt.TokenInfo;
 import com.example.dating.service.MemberService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,6 +22,7 @@ import java.util.Map;
 public class MemberController {
 
     private final MemberService memberService;
+    private final RedisService redisService;
 
     @PostMapping("/join")
     public ResponseEntity<Map<String, String>> join(@Validated @RequestBody MemberJoinDto memberJoinDto, BindingResult bindingResult) {
@@ -75,6 +76,7 @@ public class MemberController {
         // 로그인 시도
         try {
             TokenInfo jwt = memberService.login(memberJoinDto);
+            redisService.setValues(jwt.getRefreshToken(), memberJoinDto.getEmail());
             return ResponseEntity.ok(jwt);
         } catch (Exception e) {
             response.put("errorMessage", e.getMessage());

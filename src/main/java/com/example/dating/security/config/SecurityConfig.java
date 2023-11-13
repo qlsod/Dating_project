@@ -33,6 +33,8 @@ public class SecurityConfig {
                                 .antMatchers("/member/profile/save").permitAll()
                                 .antMatchers("/gwating/list").permitAll()
                                 .antMatchers("/feed/list").permitAll()
+                                .antMatchers("/member/mail/confirm").permitAll()
+                                .antMatchers("/member/password/update").permitAll()
                                 .anyRequest().authenticated())
                 .addFilterBefore(new JwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .build();

@@ -16,11 +16,19 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByEmail(String email);
 
+    @Query("select new com.example.dating.dto.member.MemberCardDto(m.id, m.name, m.residence, m.age, m.height, m.image) " +
+            "from Heart h left join Member m on h.receiver = m where h.sender.email = :email")
+    List<MemberCardDto> findSendHeartList(@Param("email") String email);
+
+    @Query("select new com.example.dating.dto.member.MemberCardDto(m.id, m.name, m.residence, m.age, m.height, m.image) " +
+            "from Heart h left join Member m on h.sender = m where h.receiver.email = :email")
+    List<MemberCardDto> findReceiverHeartList(@Param("email") String email);
+
     @Query("select new com.example.dating.dto.member.MemberCardDto(m.id, m.name, m.residence, m.age, m.height, m.image) from Member m " +
             "where not m.gender = :gender and m.id not in (select h.receiver.id from Heart h where h.sender.id = :id) order by rand()")
     List<MemberCardDto> findRandomMember(@Param("id") Long id, @Param("gender") String gender, Pageable pageable);
 
-    @Query("select new com.example.dating.dto.member.MemberMbtiDto(m.id, m.name, m.mbti) from Member m " +
+    @Query("select new com.example.dating.dto.member.MemberMbtiDto(m.id, m.name, m.mbti, m.comment) from Member m " +
             "where m.mbti in :mbtiList and not m.id = :id and m.id not in (select sm.id from Member sm where sm.id in :randomMemberIdList) order by rand()")
     List<MemberMbtiDto> findRandomMemberbyMbtiList(@Param("mbtiList") List<String> mbtiList,
                                                    @Param("randomMemberIdList") List<Long> randomMemberIdList,

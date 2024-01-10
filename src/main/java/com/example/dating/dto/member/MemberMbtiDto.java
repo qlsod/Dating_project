@@ -10,9 +10,11 @@ public class MemberMbtiDto {
     private Long id;
     private String name;
     private String mbti;
+    private String comment;
 
-    public MemberMbtiDto(Long id, String mbti) {
+    public MemberMbtiDto(Long id, String mbti, String comment) {
         this.id = id;
         this.mbti = mbti;
+        this.comment = comment;
     }
 }

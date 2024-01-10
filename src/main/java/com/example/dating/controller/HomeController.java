@@ -57,4 +57,36 @@ public class HomeController {
             return ResponseEntity.badRequest().body(response);
         }
     }
+
+    @GetMapping("/sendHeartList")
+    public ResponseEntity<Map<String, Object>> sendHeartList(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        HashMap<String, Object> response = new HashMap<>();
+
+        try {
+            String email = principalDetails.getUsername();
+            List<MemberCardDto> sendHeartList = memberService.getSendHeartList(email);
+
+            response.put("sendHeartList", sendHeartList);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("errorMessage", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @GetMapping("/receiverHeartList")
+    public ResponseEntity<Map<String, Object>> receiverHeartList(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        HashMap<String, Object> response = new HashMap<>();
+
+        try {
+            String email = principalDetails.getUsername();
+            List<MemberCardDto> sendHeartList = memberService.getReceiverHeartList(email);
+
+            response.put("sendHeartList", sendHeartList);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("errorMessage", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
 }

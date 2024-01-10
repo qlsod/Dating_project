@@ -96,6 +96,14 @@ public class MemberService {
         return memberRepository.findRandomMemberbyMbtiList(partnerMbtiList, randomMemberIdList, findMember.getId(), pageRequest);
     }
 
+    public List<MemberCardDto> getSendHeartList(String email) {
+        return memberRepository.findSendHeartList(email);
+    }
+
+    public List<MemberCardDto> getReceiverHeartList(String email) {
+        return memberRepository.findReceiverHeartList(email);
+    }
+
     public MemberInfoDto getMemberProfile(String email) {
         Member findMember = memberRepository.findByEmail(email).get();
 

@@ -2,7 +2,7 @@ package com.example.dating.repository;
 
 import com.example.dating.domain.Member;
 import com.example.dating.dto.member.MemberCardDto;
-import com.example.dating.dto.member.MemberGenderDto;
+import com.example.dating.dto.member.MemberInviteDto;
 import com.example.dating.dto.member.MemberMbtiDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,6 +15,12 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByEmail(String email);
+
+    @Query("select new com.example.dating.dto.member.MemberInviteDto(m.id, m.name, m.age, m.residence) from Member m where not m.email = :email")
+    List<MemberInviteDto> findAllNotContainMe(@Param("email") String email);
+
+    @Query("select m from Member m where m.id in :inviteIdList")
+    List<Member> findInviteMember(@Param("inviteIdList") List<Long> inviteIdList);
 
     @Query("select new com.example.dating.dto.member.MemberCardDto(m.id, m.name, m.residence, m.age, m.height, m.image) " +
             "from Heart h left join Member m on h.receiver = m where h.sender.email = :email")

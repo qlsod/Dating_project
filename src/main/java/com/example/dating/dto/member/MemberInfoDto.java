@@ -15,9 +15,6 @@ public class MemberInfoDto {
     @NotEmpty(message = "한줄 소개를 입력해주세요")
     private String comment;
 
-    @NotEmpty(message = "성별을 입력해주세요")
-    private String gender;
-
     @NotEmpty(message = "사는 곳을 입력해주세요")
     private String residence;
 
@@ -48,7 +45,6 @@ public class MemberInfoDto {
     public void mapEntityToDto(Member member) {
         this.name = member.getName();
         this.comment = member.getComment();
-        this.gender = member.getGender();
         this.residence = member.getResidence();
         this.age = member.getAge();
         this.height = member.getHeight();

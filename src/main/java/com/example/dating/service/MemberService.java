@@ -61,6 +61,10 @@ public class MemberService {
         return tokenProvider.generateToken(token);
     }
 
+    public List<MemberInviteDto> getAllMember(String email) {
+        return memberRepository.findAllNotContainMe(email);
+    }
+
     /**
      * 입력한 회원 정보 저장
      */

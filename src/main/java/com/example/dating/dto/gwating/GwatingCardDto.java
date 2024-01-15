@@ -7,16 +7,21 @@ import lombok.Getter;
 public class GwatingCardDto {
     private Long id;
     private String roomName;
-    private String genderCategory = "성별 무관";
-    private String ageCategory;
     private Integer maleCount;
+    private Integer joinMaleCount;
     private Integer femaleCount;
+    private Integer joinFemaleCount;
+    private String roomCategory;
+    private String location;
 
-    public GwatingCardDto(Long id, String roomName, String ageCategory, Integer maleCount, Integer femaleCount) {
+    public GwatingCardDto(Long id, String roomName, Integer maleCount, Integer joinMaleCount, Integer femaleCount, Integer joinFemaleCount, String roomCategory, String location) {
         this.id = id;
         this.roomName = roomName;
-        this.ageCategory = ageCategory;
         this.maleCount = maleCount;
+        this.joinMaleCount = joinMaleCount;
         this.femaleCount = femaleCount;
+        this.joinFemaleCount = joinFemaleCount;
+        this.roomCategory = roomCategory;
+        this.location = location;
     }
 }

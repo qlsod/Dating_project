@@ -156,4 +156,20 @@ public class MemberController {
             return ResponseEntity.badRequest().body(response);
         }
     }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<Map<String, String>> deleteMember(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        HashMap<String, String> response = new HashMap<>();
+
+        try {
+            String email = principalDetails.getUsername();
+            memberService.deleteMember(email);
+
+            response.put("successMessage", "회원 삭제 완료");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("errorMessage", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
 }

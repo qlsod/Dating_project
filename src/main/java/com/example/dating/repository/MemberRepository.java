@@ -16,6 +16,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByEmail(String email);
 
+    void deleteByEmail(String email);
+
     @Query("select new com.example.dating.dto.member.MemberInviteDto(m.id, m.name, m.age, m.residence) from Member m where not m.email = :email")
     List<MemberInviteDto> findAllNotContainMe(@Param("email") String email);
 

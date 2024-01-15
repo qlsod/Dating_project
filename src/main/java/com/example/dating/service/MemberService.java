@@ -129,4 +129,9 @@ public class MemberService {
         String encodePassword = passwordEncoder.encode(emailDto.getPassword());
         member.updatePassword(encodePassword);
     }
+
+    @Transactional
+    public void deleteMember(String email) {
+        memberRepository.deleteByEmail(email);
+    }
 }

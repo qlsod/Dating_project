@@ -33,7 +33,6 @@ public class Member {
     public void mapDtoToEntity(MemberInfoDto memberInfoDto) {
         this.name = memberInfoDto.getName();
         this.comment = memberInfoDto.getComment();
-        this.gender = memberInfoDto.getGender();
         this.residence = memberInfoDto.getResidence();
         this.age = memberInfoDto.getAge();
         this.height = memberInfoDto.getHeight();

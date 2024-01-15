@@ -119,7 +119,7 @@ public class MemberController {
             response.put("successMessage", "패스워드 변경 성공");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            response.put("errorMessage", "패스워드 변겯 실패");
+            response.put("errorMessage", "패스워드 변경 실패");
             return ResponseEntity.badRequest().body(response);
         }
     }

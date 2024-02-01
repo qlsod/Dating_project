@@ -2,6 +2,7 @@ package com.example.dating.controller;
 
 import com.example.dating.dto.block.BlockListDto;
 import com.example.dating.dto.email.EmailDto;
+import com.example.dating.security.jwt.TokenProvider;
 import com.example.dating.service.EmailService;
 import com.example.dating.redis.service.RedisService;
 import com.example.dating.dto.member.MemberJoinDto;
@@ -90,6 +91,17 @@ public class MemberController {
         } catch (Exception e) {
             response.put("errorMessage", e.getMessage());
             return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader("RefreshToken") String refreshToken) {
+        String refreshTokenValue = redisService.getValues(refreshToken.substring(7));
+        if (refreshTokenValue != null) {
+            redisService.delValues(refreshToken);
+            return ResponseEntity.ok("로그아웃");
+        } else {
+            return ResponseEntity.badRequest().body("오류 발생");
         }
     }
 

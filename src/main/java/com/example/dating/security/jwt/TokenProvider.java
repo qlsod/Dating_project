@@ -45,7 +45,7 @@ public class TokenProvider {
                 .collect(Collectors.joining(","));
 
         long now = (new Date()).getTime();
-        Date accessTokenExpiresIn = new Date(now + 1000 * 60 * 30);
+        Date accessTokenExpiresIn = new Date(now + 1000);
         Date refreshTokenExpiresIn = new Date(now + 1000 * 60 * 60 * 24 * 14);
 
         String accessToken = Jwts.builder()
@@ -130,7 +130,7 @@ public class TokenProvider {
 
     // email 로 password get
     public String getUserPassword(String email) {
-        return memberRepository.findByEmail(email).get().getEmail();
+        return memberRepository.findByEmail(email).get().getPassword();
     }
 
     private Jws<Claims> getClaimsJws(String accessToken) {

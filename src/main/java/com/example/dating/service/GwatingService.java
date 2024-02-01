@@ -29,8 +29,8 @@ public class GwatingService {
     private final MemberRepository memberRepository;
     private final RoomMemberRepository roomMemberRepository;
 
-    public List<GwatingCardDto> findRoomList(String roomCategory) {
-        return gwatingRepository.findAllByRoomCategory(roomCategory);
+    public List<GwatingCardDto> findRoomList(String roomCategory, String email) {
+        return gwatingRepository.findAllByRoomCategory(roomCategory, email);
     }
 
     @Transactional
@@ -98,8 +98,8 @@ public class GwatingService {
         }
     }
 
-    public List<GwatingCardDto> searchByLocation(String location) {
-        return gwatingRepository.findAllByLocation('%' + location + '%');
+    public List<GwatingCardDto> searchByLocation(String location, String email) {
+        return gwatingRepository.findAllByLocation('%' + location + '%', email);
     }
 
     @Transactional

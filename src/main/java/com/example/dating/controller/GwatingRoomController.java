@@ -28,9 +28,10 @@ public class GwatingRoomController {
     private final MemberService memberService;
 
     @GetMapping("/list")
-    public ResponseEntity<Object> roomList(@RequestParam String roomCategory) {
+    public ResponseEntity<Object> roomList(@RequestParam String roomCategory, @AuthenticationPrincipal PrincipalDetails principalDetails) {
         try {
-            List<GwatingCardDto> roomList = gwatingService.findRoomList(roomCategory);
+            String email = principalDetails.getUsername();
+            List<GwatingCardDto> roomList = gwatingService.findRoomList(roomCategory, email);
             return ResponseEntity.ok(roomList);
         } catch (Exception e) {
             HashMap<String, String> response = new HashMap<>();
@@ -103,9 +104,10 @@ public class GwatingRoomController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Object> searchByLocation(@RequestParam String location) {
+    public ResponseEntity<Object> searchByLocation(@RequestParam String location, @AuthenticationPrincipal PrincipalDetails principalDetails) {
         try {
-            List<GwatingCardDto> searchResultList = gwatingService.searchByLocation(location);
+            String email = principalDetails.getUsername();
+            List<GwatingCardDto> searchResultList = gwatingService.searchByLocation(location, email);
             return ResponseEntity.ok(searchResultList);
         } catch (Exception e) {
             HashMap<String, String> response = new HashMap<>();

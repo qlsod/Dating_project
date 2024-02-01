@@ -18,26 +18,28 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     void deleteByEmail(String email);
 
-    @Query("select new com.example.dating.dto.member.MemberInviteDto(m.id, m.name, m.age, m.residence) from Member m where not m.email = :email")
+    @Query("select new com.example.dating.dto.member.MemberInviteDto(m.id, m.name, m.age, m.residence) from Member m where not m.email = :email and m.id not in (SELECT b.blockMember.id FROM Block b WHERE b.blockItMember.email = :email)")
     List<MemberInviteDto> findAllNotContainMe(@Param("email") String email);
 
     @Query("select m from Member m where m.id in :inviteIdList")
     List<Member> findInviteMember(@Param("inviteIdList") List<Long> inviteIdList);
 
     @Query("select new com.example.dating.dto.member.MemberCardDto(m.id, m.name, m.residence, m.age, m.height, m.image) " +
-            "from Heart h left join Member m on h.receiver = m where h.sender.email = :email")
+            "from Heart h left join Member m on h.receiver = m where h.sender.email = :email and m.id not in (SELECT b.blockMember.id FROM Block b WHERE b.blockItMember.email = :email)")
     List<MemberCardDto> findSendHeartList(@Param("email") String email);
 
     @Query("select new com.example.dating.dto.member.MemberCardDto(m.id, m.name, m.residence, m.age, m.height, m.image) " +
-            "from Heart h left join Member m on h.sender = m where h.receiver.email = :email")
+            "from Heart h left join Member m on h.sender = m where h.receiver.email = :email and m.id not in (select hm.member.id from HumanMember hm) and m.id not in (SELECT b.blockMember.id FROM Block b WHERE b.blockItMember.email = :email)")
     List<MemberCardDto> findReceiverHeartList(@Param("email") String email);
 
     @Query("select new com.example.dating.dto.member.MemberCardDto(m.id, m.name, m.residence, m.age, m.height, m.image) from Member m " +
-            "where not m.gender = :gender and m.id not in (select h.receiver.id from Heart h where h.sender.id = :id) order by rand()")
+            "where not m.gender = :gender and m.id not in (select h.receiver.id from Heart h where h.sender.id = :id) " +
+            "and m.id not in (select hm.member.id from HumanMember hm) and m.id not in (SELECT b.blockMember.id FROM Block b WHERE b.blockItMember.id = :id) order by rand()")
     List<MemberCardDto> findRandomMember(@Param("id") Long id, @Param("gender") String gender, Pageable pageable);
 
     @Query("select new com.example.dating.dto.member.MemberMbtiDto(m.id, m.name, m.mbti, m.comment) from Member m " +
-            "where m.mbti in :mbtiList and not m.id = :id and m.id not in (select sm.id from Member sm where sm.id in :randomMemberIdList) order by rand()")
+            "where m.mbti in :mbtiList and not m.id = :id and m.id not in (select sm.id from Member sm where sm.id in :randomMemberIdList) " +
+            "and m.id not in (select hm.member.id from HumanMember hm) and m.id not in (SELECT b.blockMember.id FROM Block b WHERE b.blockItMember.id = :id) order by rand()")
     List<MemberMbtiDto> findRandomMemberbyMbtiList(@Param("mbtiList") List<String> mbtiList,
                                                    @Param("randomMemberIdList") List<Long> randomMemberIdList,
                                                    @Param("id") Long id,

@@ -31,10 +31,7 @@ public class SecurityConfig {
                                 .antMatchers("/member/join").permitAll()
                                 .antMatchers("/member/login").permitAll()
                                 .antMatchers("/member/profile/save").permitAll()
-                                .antMatchers("/gwating/list").permitAll()
-                                .antMatchers("/feed/list").permitAll()
-                                .antMatchers("/member/mail/confirm").permitAll()
-                                .antMatchers("/member/password/update").permitAll()
+                                .antMatchers("/ws/**").permitAll()
                                 .anyRequest().authenticated())
                 .addFilterBefore(new JwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .build();

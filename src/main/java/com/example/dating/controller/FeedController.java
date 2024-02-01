@@ -49,9 +49,10 @@ public class FeedController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<Object> getList() {
+    public ResponseEntity<Object> getList(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         try {
-            List<FeedCardDto> list = feedService.getList();
+            String email = principalDetails.getUsername();
+            List<FeedCardDto> list = feedService.getList(email);
             return ResponseEntity.ok(list);
         } catch (Exception e) {
             HashMap<String, String> response = new HashMap<>();

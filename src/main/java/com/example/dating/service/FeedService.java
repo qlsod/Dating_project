@@ -7,7 +7,9 @@ import com.example.dating.dto.feedaction.FeedCommentDto;
 import com.example.dating.dto.feedaction.FeedActionDto;
 import com.example.dating.exception.EntityNotFoundException;
 import com.example.dating.repository.*;
+import com.example.dating.security.auth.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,8 +41,8 @@ public class FeedService {
         feedRepository.save(feed);
     }
 
-    public List<FeedCardDto> getList() {
-        return feedRepository.findAllOrderByIdDesc();
+    public List<FeedCardDto> getList(String email) {
+        return feedRepository.findAllOrderByIdDesc(email);
     }
 
     @Transactional

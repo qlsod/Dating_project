@@ -1,9 +1,14 @@
 package com.example.dating.service;
 
+import com.example.dating.domain.Block;
+import com.example.dating.domain.HumanMember;
 import com.example.dating.domain.Member;
+import com.example.dating.dto.block.BlockListDto;
 import com.example.dating.dto.email.EmailDto;
 import com.example.dating.dto.member.*;
 import com.example.dating.mbti.Mbti;
+import com.example.dating.repository.BlockRepository;
+import com.example.dating.repository.HumanMemberRepository;
 import com.example.dating.repository.MemberRepository;
 import com.example.dating.security.jwt.TokenInfo;
 import com.example.dating.security.jwt.TokenProvider;
@@ -26,6 +31,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
+    private final BlockRepository blockRepository;
+    private final HumanMemberRepository humanMemberRepository;
 
     @Transactional
     public Long join(MemberJoinDto memberJoinDto) throws RuntimeException {
@@ -54,6 +61,13 @@ public class MemberService {
         // 복호화한 패스워드와 입력한 패스워드가 다르면 틀린 비밀번호
         if (!passwordEncoder.matches(memberJoinDto.getPassword(), member.getPassword())) {
             throw new Exception("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 휴먼계정이면 휴먼계정 해제
+        Optional<HumanMember> humanMemberOptional = humanMemberRepository.findByEmail(memberJoinDto.getEmail());
+        if (humanMemberOptional.isPresent()) {
+            HumanMember humanMember = humanMemberOptional.get();
+            humanMemberRepository.delete(humanMember);
         }
 
         // jwt 발급
@@ -116,6 +130,27 @@ public class MemberService {
         return memberInfoDto;
     }
 
+    public MemberInfoDto getMemberProfile(Long id) {
+        Member findMember = memberRepository.findById(id).get();
+
+        MemberInfoDto memberInfoDto = new MemberInfoDto();
+        memberInfoDto.mapEntityToDto(findMember);
+        return memberInfoDto;
+    }
+
+    @Transactional
+    public void block(Long id, String email) throws Exception {
+        Member findBlockItMember = memberRepository.findByEmail(email).get();
+        Optional<Member> blockMemberOptional = memberRepository.findById(id);
+        if (blockMemberOptional.isEmpty()) {
+            throw new Exception("차단하려는 사용자가 존재하지 않습니다.");
+        }
+        Member blockMember = blockMemberOptional.get();
+
+        Block block = new Block(findBlockItMember, blockMember);
+        blockRepository.save(block);
+    }
+
     @Transactional
     public void updateMemberProfile(String email, MemberInfoDto memberInfoDto) {
         Member findMember = memberRepository.findByEmail(email).get();
@@ -133,5 +168,23 @@ public class MemberService {
     @Transactional
     public void deleteMember(String email) {
         memberRepository.deleteByEmail(email);
+    }
+
+    @Transactional
+    public void addHumanMember(String email) {
+        Member member = memberRepository.findByEmail(email).get();
+
+        HumanMember humanMember = new HumanMember(member);
+        humanMemberRepository.save(humanMember);
+    }
+
+    public List<BlockListDto> getBlockMemberList(String email) {
+        return blockRepository.findByEmail(email);
+    }
+
+    @Transactional
+    public void deleteBlockMember(String email, Long id) {
+        Long myId = memberRepository.findByEmail(email).get().getId();
+        blockRepository.deleteBlockMemberById(myId, id);
     }
 }

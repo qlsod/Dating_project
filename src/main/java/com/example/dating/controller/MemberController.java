@@ -1,5 +1,6 @@
 package com.example.dating.controller;
 
+import com.example.dating.dto.block.BlockListDto;
 import com.example.dating.dto.email.EmailDto;
 import com.example.dating.service.EmailService;
 import com.example.dating.redis.service.RedisService;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -131,6 +133,83 @@ public class MemberController {
             return ResponseEntity.ok(memberProfile);
         } catch (Exception e) {
             HashMap<String, String> response = new HashMap<>();
+            response.put("errorMessage", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @GetMapping("/profile/{id}")
+    public ResponseEntity<Object> getOtherMemberProfile(@PathVariable Long id) {
+        try {
+            MemberInfoDto otherMemberProfile = memberService.getMemberProfile(id);
+            return ResponseEntity.ok(otherMemberProfile);
+        } catch (Exception e) {
+            HashMap<String, String> response = new HashMap<>();
+            response.put("errorMessage", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    // 휴먼유저는 추천에만 안 뜨게.. 설정한 뒤에 로그인하면 자동으로 휴먼계정 해제
+    @PostMapping("/humanUser")
+    public ResponseEntity<Map<String, String>> humanMember(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        HashMap<String, String> response = new HashMap<>();
+
+        try {
+            String email = principalDetails.getUsername();
+            memberService.addHumanMember(email);
+
+            response.put("successMessage", "휴먼계정 전환 성공");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("errorMessage", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    // 차단은 했고 이제 차단당한 사람과 차단한 사람이 서로 보이지 않도록 해야한다..!!
+    @PostMapping("/block/{id}")
+    public ResponseEntity<Map<String, String>> blockMember(@PathVariable Long id,
+                                                           @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        HashMap<String, String> response = new HashMap<>();
+        try {
+            String username = principalDetails.getUsername();
+            memberService.block(id, username);
+            response.put("successMessage", "차단되었습니다.");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("errorMessage", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @GetMapping("/block")
+    public ResponseEntity<Map<String, Object>> blockMemberList(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        HashMap<String, Object> response = new HashMap<>();
+
+        try {
+            String email = principalDetails.getUsername();
+            List<BlockListDto> blockMemberList = memberService.getBlockMemberList(email);
+            response.put("blockMemberList",  blockMemberList);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("errorMessage", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    // 차단 해제
+    @PostMapping("nonblock/{id}")
+    public ResponseEntity<Map<String, String>> cancelBlockMember(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                                                 @PathVariable Long id) {
+        HashMap<String, String> response = new HashMap<>();
+
+        try {
+            String email = principalDetails.getUsername();
+            memberService.deleteBlockMember(email, id);
+            response.put("successMessage", "차단이 해제됨");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
             response.put("errorMessage", e.getMessage());
             return ResponseEntity.badRequest().body(response);
         }

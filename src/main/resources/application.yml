@@ -1,19 +1,29 @@
 spring:
   datasource:
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
+    url: "jdbc:h2:mem:test"
+    username: username
+    password: pw
     driver-class-name: org.h2.Driver
+  #  driver-class-name: com.mysql.cj.jdbc.Driver
+  #  url: "jdbc:mysql://localhost:3306/"
+  #  username: "cammeet"
+  #  password: "cammeet"
 
   jpa:
+    #    database: mysql
+    #    database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: update
 
     show-sql: true
-
+  #
+  #  redis:
+  #    port: 6379
+  #    host: redis
+  #
   redis:
     port: 6379
-    host: redis
+    host: localhost
 
   mail:
     host: smtp.gmail.com
@@ -29,4 +39,4 @@ spring:
             required: true
 
 jwt:
-  secret: ${JWT_SECRET_KEY}
+  secret: "FhlUydg3RUhIWphN5SzGr5o6oF2T9JazpFwSi23vDFs="

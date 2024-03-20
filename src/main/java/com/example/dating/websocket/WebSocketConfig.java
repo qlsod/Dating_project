@@ -17,6 +17,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
         // "/ws/chat" - WebSocket 연결이 설정될 엔드포인트. 이 경로로 요청하면 웹소켓 핸드쉐이킹
         // setAllowedOrigins("*") - 모든 CORS 요청 혀용
         // 정리하자면 클라이언트가 "/ws/chat" 경로로 요청하면 webSocketHandler 에서 제공하는 웹소켓 기능을 사용할 수 있다.
+
         registry.addHandler(webSocketHandler, "/ws/chat").setAllowedOrigins("*");
 
     }

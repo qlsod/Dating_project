@@ -38,15 +38,15 @@ public class HomeController {
 
             // 이성 회원 랜덤 20명 추천
             List<MemberCardDto> randomMemberList = memberService.getRandomMemberList(email);
-            // mbti 잘 맞는 이성 회원 랜덤 5명 추천
-            List<MemberMbtiDto> goodMbtiList = memberService.getGoodMbtiList(email, randomMemberList);
+//            // mbti 잘 맞는 이성 회원 랜덤 5명 추천
+//            List<MemberMbtiDto> goodMbtiList = memberService.getGoodMbtiList(email, randomMemberList);
             // 내가 관심 있는 친구
             List<HeartMemberDto> sendHeartList = heartService.sendHeartList(email);
             // 나한테 관심 있는 친구
             List<HeartMemberDto> receiverHeartList = heartService.receiverHeartList(email);
 
             response.put("randomMemberList", randomMemberList);
-            response.put("goodMbtiList", goodMbtiList);
+//            response.put("goodMbtiList", goodMbtiList);
             response.put("notCheckAlert", notCheckAlert);
             response.put("sendHeartList", sendHeartList);
             response.put("receiverHeartList", receiverHeartList);

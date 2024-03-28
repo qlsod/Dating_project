@@ -22,6 +22,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf().disable()
+                .cors().disable()
                 .httpBasic().disable()
                 .formLogin().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -32,6 +33,7 @@ public class SecurityConfig {
                                 .antMatchers("/member/login").permitAll()
                                 .antMatchers("/member/profile/save").permitAll()
                                 .antMatchers("/ws/**").permitAll()
+                                .antMatchers("/h2-console/**").permitAll()
                                 .anyRequest().authenticated())
                 .addFilterBefore(new JwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .build();

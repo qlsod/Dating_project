@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,8 +71,9 @@ public class MemberService {
             humanMemberRepository.delete(humanMember);
         }
 
-        // jwt 발급
-        Authentication token = new UsernamePasswordAuthenticationToken(member.getEmail(), member.getPassword());
+        // jwt 발급 (임시 권한 User 부여)
+        Authentication token = new UsernamePasswordAuthenticationToken(member.getEmail(), member.getPassword(), List.of(new SimpleGrantedAuthority("User")));
+
         return tokenProvider.generateToken(token);
     }
 

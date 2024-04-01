@@ -32,6 +32,8 @@ public class SecurityConfig {
                                 .antMatchers("/member/join").permitAll()
                                 .antMatchers("/member/login").permitAll()
                                 .antMatchers("/member/profile/save").permitAll()
+                                .antMatchers("/member/mail/confirm").permitAll()
+                                .antMatchers("/refresh").permitAll()
                                 .antMatchers("/ws/**").permitAll()
                                 .antMatchers("/h2-console/**").permitAll()
                                 .anyRequest().authenticated())

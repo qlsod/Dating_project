@@ -30,14 +30,14 @@ public class EmailService {
     private void createCode() {
         int length = 6;
         try {
-            Random random = SecureRandom.getInstanceStrong();
+            Random random = SecureRandom.getInstance("SHA1PRNG");
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < length; i++) {
                 builder.append(random.nextInt(10));
             }
             code = builder.toString();
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("에러");
+            throw new RuntimeException("Mail createCode Error");
         }
     }
 
@@ -45,7 +45,7 @@ public class EmailService {
     public MimeMessage createEmailForm(String email) throws MessagingException {
 
         createCode();//인증 코드 생성
-        String setFrom = "campusmeet123@gmail.com"; // 보내는 사람
+        String setFrom = "rlatpals103@gmail.com"; // 보내는 사람
         String title = "[캠밋] 인증번호를 안내해드립니다."; // 제목
 
         MimeMessage message = emailSender.createMimeMessage();

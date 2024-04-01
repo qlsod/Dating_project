@@ -10,6 +10,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,6 +24,7 @@ import java.util.Date;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public class TokenProvider {
 
     private final Key key;
@@ -46,7 +48,7 @@ public class TokenProvider {
 
         long now = (new Date()).getTime();
 
-        Date accessTokenExpiresIn = new Date(now + 1000 * 1000);
+        Date accessTokenExpiresIn = new Date(now + 1000 * 60 * 30);
         Date refreshTokenExpiresIn = new Date(now + 1000 * 60 * 60 * 24 * 14);
 
         String accessToken = Jwts.builder()
@@ -99,9 +101,9 @@ public class TokenProvider {
         return new UsernamePasswordAuthenticationToken(principalDetails, null, principalDetails.getAuthorities());
     }
 
-    public boolean validateToken(String accessToken) {
+    public boolean validateToken(String token) {
         try {
-            Jws<Claims> claims = getClaimsJws(accessToken);
+            Jws<Claims> claims = getClaimsJws(token);
             // 엑세스 토큰 만료기한이 현재 날짜 이전이 아니면 통과
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {

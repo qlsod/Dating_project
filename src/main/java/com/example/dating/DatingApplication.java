@@ -14,6 +14,9 @@ public class DatingApplication {
 		SpringApplication.run(DatingApplication.class, args);
 	}
 
+	static {
+		System.setProperty("com.amazonaws.sdk.disableEc2Metadata", "true");
+	}
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();

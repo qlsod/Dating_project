@@ -22,12 +22,12 @@ public class ChatController {
 
     @PostMapping("/create/{id}")
     public ResponseEntity<Map<String, String>> createChatRoom(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                                              @PathVariable Long id) {
+                                                              @PathVariable Long id, @RequestParam String type) {
         HashMap<String, String> response = new HashMap<>();
 
         try {
             String email = principalDetails.getUsername();
-            Long chatRoomId = chatRoomService.createRoom(email, id);
+            Long chatRoomId = chatRoomService.createRoom(email, id, type);
             response.put("chatRoomId", chatRoomId.toString());
             return ResponseEntity.ok(response);
         } catch (Exception e) {

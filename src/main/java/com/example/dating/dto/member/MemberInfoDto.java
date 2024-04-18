@@ -2,11 +2,14 @@ package com.example.dating.dto.member;
 
 import com.example.dating.domain.Member;
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Getter
+@Setter
 public class MemberInfoDto {
 
     @NotEmpty(message = "이름을 입력해주세요")
@@ -25,6 +28,9 @@ public class MemberInfoDto {
     private int height;
 
     @NotEmpty(message = "사진을 입력해주세요")
+    private List<String> images;
+
+    @NotEmpty(message = "대표 이미지를 입력해주세요")
     private String image;
 
     @NotEmpty(message = "인적사항을 입력해주세요")
@@ -55,5 +61,6 @@ public class MemberInfoDto {
         this.interest = member.getInterest();
         this.likePersonality = member.getLikePersonality();
     }
-}
 
+
+}

@@ -2,7 +2,6 @@ package com.example.dating.controller;
 
 import com.example.dating.dto.block.BlockListDto;
 import com.example.dating.dto.email.EmailDto;
-import com.example.dating.security.jwt.TokenProvider;
 import com.example.dating.service.EmailService;
 import com.example.dating.redis.service.RedisService;
 import com.example.dating.dto.member.MemberJoinDto;
@@ -11,7 +10,9 @@ import com.example.dating.repository.MemberRepository;
 import com.example.dating.security.auth.PrincipalDetails;
 import com.example.dating.security.jwt.TokenInfo;
 import com.example.dating.service.MemberService;
+import com.example.dating.service.ImageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
@@ -27,12 +28,14 @@ import java.util.Map;
 @RestController
 @RequestMapping("/member")
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
 
     private final MemberService memberService;
     private final RedisService redisService;
     private final EmailService emailService;
     private final MemberRepository memberRepository;
+    private final ImageService imageService;
 
     @PostMapping("/join")
     public ResponseEntity<Map<String, String>> join(@Validated @RequestBody MemberJoinDto memberJoinDto, BindingResult bindingResult) {
@@ -53,8 +56,9 @@ public class MemberController {
         }
     }
 
+    // 프로필 생성
     @PostMapping("/profile/save")
-    public ResponseEntity<Map<String, String>> saveMemberProfile(@RequestParam("id") Long memberId,
+    public ResponseEntity<Map<String, String>> saveMemberProfile(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                                  @Validated @RequestBody MemberInfoDto memberInfoDto,
                                                                  BindingResult bindingResult) {
         HashMap<String, String> response = new HashMap<>();
@@ -65,7 +69,14 @@ public class MemberController {
         }
 
         try {
-            memberService.save(memberId, memberInfoDto);
+            String email = principalDetails.getUsername();
+
+            /** 해당 이미지들을 저장하는 메소드 필요
+            **/
+            memberService.saveProfileImages(email, memberInfoDto);
+
+            memberService.save(email, memberInfoDto);
+
             response.put("successMessage", "프로필 저장 성공");
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {

@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,12 +24,12 @@ public class ChatRoomService {
     private final MessageRepository messageRepository;
 
     @Transactional
-    public Long createRoom(String email, Long id) {
+    public Long createRoom(String email, Long id, String type) {
         Member member = memberRepository.findByEmail(email).get();
         Member otherMember = memberRepository.findById(id).get();
         String chatRoomId = UUID.randomUUID().toString();
 
-        ChatRoom chatRoom = new ChatRoom(member, otherMember, chatRoomId, "개인");
+        ChatRoom chatRoom = new ChatRoom(member, otherMember, chatRoomId, type);
         chatRoomRepository.save(chatRoom);
         return chatRoom.getId();
     }
@@ -36,8 +37,14 @@ public class ChatRoomService {
     public List<ChatListDto> getList(String email, String type) {
         List<ChatListDto> listByMember = chatRoomRepository.findListByMember(email, type);
         List<ChatListDto> listByOtherMember = chatRoomRepository.findListByOtherMember(email, type);
-        listByMember.addAll(listByOtherMember);
-        return listByMember;
+//        listByMember.addAll(listByOtherMember);
+//        return listByMember;
+        // 두 목록을 결합
+        List<ChatListDto> combinedList = new ArrayList<>();
+        combinedList.addAll(listByMember);
+        combinedList.addAll(listByOtherMember);
+
+        return combinedList;
     }
 
     public List<ChatOneDto> getOne(String email, Long roomId) {

@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface RoomMemberRepository extends JpaRepository<RoomMember, Long> {
-    @Query("select new com.example.dating.dto.member.MemberInviteDto(m.id, m.name, m.age, m.residence) from RoomMember r left join Member m on r.member.id = m.id")
+    @Query("select new com.example.dating.dto.member.MemberInviteDto(m.id, m.nickName, m.age, m.address) from RoomMember r left join Member m on r.member.id = m.id")
     List<MemberInviteDto> findRoomMember();
 }

@@ -49,7 +49,7 @@ public class HeartService {
         Alert alert = Alert.builder()
                 .receiverMember(receiverMember)
                 .image(sendMember.getImage())
-                .name(sendMember.getName())
+                .name(sendMember.getNickName())
                 .message("나에게 하트를 눌렀어요! 마음에 드시나요?")
                 .sendAt(LocalDate.now().toString())
                 .isCheck(false)

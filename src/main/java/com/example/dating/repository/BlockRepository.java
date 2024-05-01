@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface BlockRepository extends JpaRepository<Block, Long> {
-    @Query("SELECT NEW com.example.dating.dto.block.BlockListDto(b.blockMember.id, b.blockMember.image, b.blockMember.name, b.blockMember.residence, b.blockMember.age, b.blockMember.height) FROM Block b WHERE b.blockItMember.email = :email")
+    @Query("SELECT NEW com.example.dating.dto.block.BlockListDto(b.blockMember.id, b.blockMember.image, b.blockMember.nickName, b.blockMember.address, b.blockMember.age, b.blockMember.height) FROM Block b WHERE b.blockItMember.email = :email")
     List<BlockListDto> findByEmail(@Param("email") String email);
 
     @Modifying

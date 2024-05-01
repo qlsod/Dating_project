@@ -11,11 +11,11 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface HeartRepository extends JpaRepository<Heart, Long> {
-    @Query("select new com.example.dating.dto.heart.HeartMemberDto(m.id, m.name, m.age) " +
+    @Query("select new com.example.dating.dto.heart.HeartMemberDto(m.id, m.nickName, m.age) " +
             "from Heart h left join Member m on h.receiver = m where h.sender.email = :email order by rand()")
     List<HeartMemberDto> findFiveRandomMemberBySender(@Param("email") String email, Pageable pageable);
 
-    @Query("select new com.example.dating.dto.heart.HeartMemberDto(m.id, m.name, m.age) " +
+    @Query("select new com.example.dating.dto.heart.HeartMemberDto(m.id, m.nickName, m.age) " +
             "from Heart h left join Member m on h.sender = m where h.receiver.email = :email order by rand()")
     List<HeartMemberDto> findFiveRandomMemberByReceiver(@Param("email") String email, Pageable pageable);
 

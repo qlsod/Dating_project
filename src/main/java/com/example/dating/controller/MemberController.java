@@ -117,9 +117,9 @@ public class MemberController {
     }
 
     @PostMapping("/mail/confirm")
-    public ResponseEntity<Map<String, String>> mailConfirm(@RequestBody EmailDto emailDto) {
+    public ResponseEntity<Map<String, String>> mailConfirm(@RequestParam String email) {
         HashMap<String, String> response = new HashMap<>();
-        String email = emailDto.getEmail();
+//        String email = emailDto.getEmail();
         try {
             // 해당 이메일로 된 계정이 존재하지 않으면
             if (memberRepository.findByEmail(email).isEmpty()) {

@@ -138,16 +138,16 @@ public class MemberService {
     /**
      * 나와 잘 맞는 mbti를 가진 5명의 이성 회원을 추천
      */
-    public List<MemberMbtiDto> getGoodMbtiList(String email, List<MemberCardDto> randomMemberList) {
-        Member findMember = memberRepository.findByEmail(email).get();
-
-        List<String> partnerMbtiList = Mbti.getGoodPartner(findMember.getMbti());
-
-        List<Long> randomMemberIdList = randomMemberList.stream().map(MemberCardDto::getId).collect(Collectors.toList());
-
-        PageRequest pageRequest = PageRequest.of(0, 5);
-        return memberRepository.findRandomMemberbyMbtiList(partnerMbtiList, randomMemberIdList, findMember.getId(), pageRequest);
-    }
+//    public List<MemberMbtiDto> getGoodMbtiList(String email, List<MemberCardDto> randomMemberList) {
+//        Member findMember = memberRepository.findByEmail(email).get();
+//
+////        List<String> partnerMbtiList = Mbti.getGoodPartner(findMember.getMbti());
+//
+//        List<Long> randomMemberIdList = randomMemberList.stream().map(MemberCardDto::getId).collect(Collectors.toList());
+//
+//        PageRequest pageRequest = PageRequest.of(0, 5);
+//        return memberRepository.findRandomMemberbyMbtiList(partnerMbtiList, randomMemberIdList, findMember.getId(), pageRequest);
+//    }
 
     public List<MemberCardDto> getSendHeartList(String email) {
         return memberRepository.findSendHeartList(email);

@@ -45,7 +45,7 @@ public class EmailService {
     public MimeMessage createEmailForm(String email) throws MessagingException {
 
         createCode();//인증 코드 생성
-        String setFrom = "rlatpals103@gmail.com"; // 보내는 사람
+        String setFrom = "cammeet3824@gmail.com"; // 보내는 사람
         String title = "[캠밋] 인증번호를 안내해드립니다."; // 제목
 
         MimeMessage message = emailSender.createMimeMessage();

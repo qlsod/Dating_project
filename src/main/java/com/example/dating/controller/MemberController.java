@@ -122,10 +122,10 @@ public class MemberController {
 //        String email = emailDto.getEmail();
         try {
             // 해당 이메일로 된 계정이 존재하지 않으면
-            if (memberRepository.findByEmail(email).isEmpty()) {
-                response.put("errorMessage", "일치하는 계정이 없습니다.");
-                return ResponseEntity.badRequest().body(response);
-            }
+//            if (memberRepository.findByEmail(email).isEmpty()) {
+//                response.put("errorMessage", "일치하는 계정이 없습니다.");
+//                return ResponseEntity.badRequest().body(response);
+//            }
             // 존재하면 인증 번호를 메일로 전송
             String code = emailService.sendEmail(email);
             response.put("code", code);

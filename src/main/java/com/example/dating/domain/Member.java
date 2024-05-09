@@ -19,7 +19,7 @@ public class Member {
     @Column(name = "MEMBER_ID")
     private Long id;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private LocalDate birthDay;
     private String email;
     private String password;

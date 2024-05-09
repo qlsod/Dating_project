@@ -22,7 +22,7 @@ public class MemberInfoDto {
     private String description;
 
     @NotNull(message = "생일을 입력해주세요")
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private LocalDate birthDay;
 
     @NotEmpty(message = "사는 곳을 입력해주세요")

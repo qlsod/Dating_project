@@ -13,6 +13,7 @@ import com.example.dating.service.MemberService;
 import com.example.dating.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
@@ -58,30 +59,27 @@ public class MemberController {
 
     // 프로필 생성
     @PostMapping("/profile/save")
-    public ResponseEntity<Map<String, String>> saveMemberProfile(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                                                 @Validated @RequestBody MemberInfoDto memberInfoDto,
-                                                                 BindingResult bindingResult) {
-        HashMap<String, String> response = new HashMap<>();
+    public ResponseEntity<MemberInfoDto> saveMemberProfile(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                                           @RequestBody @Validated MemberInfoDto memberInfoDto) {
 
-        if (bindingResult.hasErrors()) {
-            response.put("errorMessage", bindingResult.getFieldError().getDefaultMessage());
-            return ResponseEntity.badRequest().body(response);
-        }
+//        if (bindingResult.hasErrors()) {
+//            response.put("errorMessage", bindingResult.getFieldError().getDefaultMessage());
+//            return ResponseEntity.badRequest().body(memberInfoDto);
+//        }
 
         try {
             String email = principalDetails.getUsername();
 
-            /** 해당 이미지들을 저장하는 메소드 필요
+            /** 해당 이미지들을 저장하는 메소드
             **/
             memberService.saveProfileImages(email, memberInfoDto);
 
             memberService.save(email, memberInfoDto);
 
-            response.put("successMessage", "프로필 저장 성공");
-            return ResponseEntity.ok(response);
+            // requestDto 내용 반환
+            return ResponseEntity.status(HttpStatus.CREATED).body(memberInfoDto);
         } catch (RuntimeException e) {
-            response.put("errorMessage", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            throw new RuntimeException("errorMessage", e);
         }
     }
 

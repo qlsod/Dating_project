@@ -116,7 +116,6 @@ public class MemberService {
         List<ProfileImage> profileImages = imageUrls.stream()
                 .map(imageUrl -> new ProfileImage(member, imageUrl))
                 .collect(Collectors.toList());
-        log.info("3");
 
         profileImagesRepository.saveAll(profileImages);
     }

@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -115,7 +117,7 @@ public class MemberService {
         // 이미지 URL들을 ProfileImage 엔티티로 생성하여 저장
         List<ProfileImage> profileImages = imageUrls.stream()
                 .map(imageUrl -> new ProfileImage(member, imageUrl))
-                .collect(Collectors.toList());
+                .collect(toList());
 
         profileImagesRepository.saveAll(profileImages);
     }
@@ -131,7 +133,11 @@ public class MemberService {
         log.info(String.valueOf(findMember));
 
         PageRequest pageRequest = PageRequest.of(0, 20);
-        return memberRepository.findRandomMember(findMember.getId(), findMember.getGender(), pageRequest);
+//        return memberRepository.findRandomMember(findMember.getId(), findMember.getGender(), pageRequest);
+        List<Member> result = memberRepository.findRandomRecommendMemberList(findMember.getGender(), pageRequest);
+        return result.stream().map(Member::toMemberCardDto).collect(toList());
+
+
     }
 
     /**

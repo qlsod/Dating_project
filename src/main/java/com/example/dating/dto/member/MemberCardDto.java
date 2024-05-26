@@ -8,7 +8,7 @@ import lombok.Getter;
 public class MemberCardDto {
     private Long id;
     private String name;
-    private String residence;
+    private String address;
     private Integer age;
     private Integer height;
     private String image;

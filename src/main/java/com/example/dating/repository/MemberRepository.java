@@ -1,6 +1,7 @@
 package com.example.dating.repository;
 
 import com.example.dating.domain.Member;
+import com.example.dating.domain.Search;
 import com.example.dating.dto.member.MemberCardDto;
 import com.example.dating.dto.member.MemberInviteDto;
 import com.example.dating.dto.member.MemberMbtiDto;
@@ -20,6 +21,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("select new com.example.dating.dto.member.MemberInviteDto(m.id, m.nickName, m.age, m.address) from Member m where not m.email = :email and m.id not in (SELECT b.blockMember.id FROM Block b WHERE b.blockItMember.email = :email)")
     List<MemberInviteDto> findAllNotContainMe(@Param("email") String email);
+
+    @Query("select m from Member m WHERE m.email = :email")
+    Member findIdByEmail(@Param("email") String email);
 
     @Query("select m from Member m where m.id in :inviteIdList")
     List<Member> findInviteMember(@Param("inviteIdList") List<Long> inviteIdList);
@@ -44,4 +48,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 //                                                   @Param("randomMemberIdList") List<Long> randomMemberIdList,
 //                                                   @Param("id") Long id,
 //                                                   Pageable pageable);
+
+    @Query(value = "SELECT m FROM Member m WHERE NOT m.gender = :gender")
+    List<Member> findRandomRecommendMemberList(@Param("gender") String gender, Pageable pageable);
 }

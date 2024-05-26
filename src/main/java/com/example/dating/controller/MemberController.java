@@ -62,11 +62,6 @@ public class MemberController {
     public ResponseEntity<MemberInfoDto> saveMemberProfile(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                            @RequestBody @Validated MemberInfoDto memberInfoDto) {
 
-//        if (bindingResult.hasErrors()) {
-//            response.put("errorMessage", bindingResult.getFieldError().getDefaultMessage());
-//            return ResponseEntity.badRequest().body(memberInfoDto);
-//        }
-
         try {
             String email = principalDetails.getUsername();
 
@@ -79,7 +74,7 @@ public class MemberController {
             // requestDto 내용 반환
             return ResponseEntity.status(HttpStatus.CREATED).body(memberInfoDto);
         } catch (RuntimeException e) {
-            throw new RuntimeException("errorMessage", e);
+            throw new RuntimeException("저장실패");
         }
     }
 

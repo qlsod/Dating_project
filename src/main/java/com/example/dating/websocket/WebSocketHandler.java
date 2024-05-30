@@ -36,6 +36,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private final ChatRoomRepository chatRoomRepository;
     private final MessageRepository messageRepository;
 
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        log.info("Connect Success");
+    }
+
     // 소켓 통신 시 메세지의 전송을 다루는 부분
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
@@ -46,8 +51,16 @@ public class WebSocketHandler extends TextWebSocketHandler {
         // 메시지 내용을 Java 객체로 변환
         ChatMessageDto chatMessageDto = mapper.readValue(payload, ChatMessageDto.class);
 
+        String jsonMessage = mapper.writeValueAsString(chatMessageDto);
+
+
+        TextMessage textMessage = new TextMessage(jsonMessage);
+
+
         // 현재 세션이 세션 Set 에 없으면 추가
+
         sessions.add(session);
+//        session.sendMessage(textMessage);
         System.out.println(session);
 
         String chatRoomUUID = chatRoomRepository.findChatRoomUUID(chatMessageDto.getChatRoomId());
@@ -69,10 +82,12 @@ public class WebSocketHandler extends TextWebSocketHandler {
             chatMessage.mapToEntity(chatMessageDto);
             messageRepository.save(chatMessage);
             try {
-                sendMessageToChatRoom(chatMessageDto, chatRoomSessions);
+
+                session.sendMessage(textMessage);
+//                sendMessageToChatRoom(chatMessageDto, chatRoomSessions);
             } catch (IllegalStateException e) {
                 removeClosedSession(sessions, session);
-                sendMessageToChatRoom(chatMessageDto, chatRoomSessions);
+//                sendMessageToChatRoom(chatMessageDto, chatRoomSessions);
             }
 
         }

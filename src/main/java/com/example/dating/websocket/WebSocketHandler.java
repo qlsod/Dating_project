@@ -51,14 +51,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
         // 메시지 내용을 Java 객체로 변환
         ChatMessageDto chatMessageDto = mapper.readValue(payload, ChatMessageDto.class);
 
+        // ChatMessageDto 객체를 JSON 형식으로 변환
         String jsonMessage = mapper.writeValueAsString(chatMessageDto);
-
-
         TextMessage textMessage = new TextMessage(jsonMessage);
 
-
         // 현재 세션이 세션 Set 에 없으면 추가
-
         sessions.add(session);
 //        session.sendMessage(textMessage);
         System.out.println(session);
@@ -82,14 +79,12 @@ public class WebSocketHandler extends TextWebSocketHandler {
             chatMessage.mapToEntity(chatMessageDto);
             messageRepository.save(chatMessage);
             try {
-
-                session.sendMessage(textMessage);
-//                sendMessageToChatRoom(chatMessageDto, chatRoomSessions);
+//                sendMessage(session, jsonMessage);
+                sendMessageToChatRoom(textMessage, chatRoomSessions);
             } catch (IllegalStateException e) {
                 removeClosedSession(sessions, session);
-//                sendMessageToChatRoom(chatMessageDto, chatRoomSessions);
+                sendMessageToChatRoom(textMessage, chatRoomSessions);
             }
-
         }
 
         // 채팅 메시지 타입이 QUIT 이면 해당 채팅방 세션에서 제거
@@ -98,27 +93,22 @@ public class WebSocketHandler extends TextWebSocketHandler {
             chatRoomSessions.remove(session);
             session.close();
         }
-
-//        // 누적 세션이 3개 이상이라면 채팅방 세션 정리
-//        if (sessions.size() >= 3) {
-//            removeClosedSession(sessions, session);
-//        }
     }
 
     // 채팅방에 포함된 세션 중 현재 열려있지 않는 세션은 제거하는 메서드
     private void removeClosedSession(Set<WebSocketSession> sessions, WebSocketSession session) {
-        sessions.removeIf(s -> !session.equals(s));
+        sessions.removeIf(s -> !session.isOpen());
     }
 
     // 특정 채팅방의 모든 WebSocket 세션에 메시지를 전송하는 메서드
-    private void sendMessageToChatRoom(ChatMessageDto chatMessage, Set<WebSocketSession> chatRoomSession) {
-        chatRoomSession.parallelStream().forEach(sess -> sendMessage(sess, chatMessage.getMessage()));
+    private void sendMessageToChatRoom(TextMessage textMessage, Set<WebSocketSession> chatRoomSession) {
+        chatRoomSession.parallelStream().forEach(sess -> sendMessage(sess, textMessage.getPayload()));
     }
 
     // 메시지 전송 메서드
-    public <T> void sendMessage(WebSocketSession session, T message) {
-        try{
-            session.sendMessage(new TextMessage(mapper.writeValueAsString(message)));
+    public void sendMessage(WebSocketSession session, String message) {
+        try {
+            session.sendMessage(new TextMessage(message));
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }

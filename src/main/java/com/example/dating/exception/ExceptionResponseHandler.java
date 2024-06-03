@@ -1,6 +1,8 @@
 package com.example.dating.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -9,6 +11,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
+
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,6 +64,18 @@ public class ExceptionResponseHandler {
     @ExceptionHandler(Exception.class)
     public String handleAllExceptions(Exception e) {
         return "An unexpected error occurred!";
+    }
+
+
+    // 웹소켓 예외 처리
+    public static class CustomWebSocketHandler extends TextWebSocketHandler {
+        private static final Logger logger = LoggerFactory.getLogger(CustomWebSocketHandler.class);
+
+        @Override
+        public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
+            logger.error("WebSocket transport error:", exception);
+            super.handleTransportError(session, exception);
+        }
     }
 
 }

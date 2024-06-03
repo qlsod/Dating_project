@@ -82,6 +82,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
 //                sendMessage(session, jsonMessage);
                 sendMessageToChatRoom(textMessage, chatRoomSessions);
             } catch (IllegalStateException e) {
+                log.error(e.getMessage(), e);
                 removeClosedSession(sessions, session);
                 sendMessageToChatRoom(textMessage, chatRoomSessions);
             }

@@ -49,20 +49,24 @@ public class ChatRoomService {
 
     public List<ChatOneDto> getOne(String email, Long roomId) {
         List<ChatOneDto> messages;
+        // email로 member 찾기
         Member member = memberRepository.findByEmail(email).get();
+
+        // roomId로 chatRoom 정보 찾기
         ChatRoom chatRoom = chatRoomRepository.findChatRoomById(roomId).get();
+
         if (chatRoom.getMember().equals(member)) {
             messages = messageRepository.findMessagesOtherMember(roomId);
         } else {
             messages = messageRepository.findMessagesMember(roomId);
         }
 
-        messages.forEach(message -> {
-            message.setMyId(member.getId());
-            if (message.getMyId().equals(message.getId())) {
-                message.setImage(null);
-            }
-        });
+//        messages.forEach(message -> {
+//            message.setMyId(member.getId());
+//            if (message.getMyId().equals(message.getId())) {
+//                message.setImage(null);
+//            }
+//        });
 
         return messages;
     }

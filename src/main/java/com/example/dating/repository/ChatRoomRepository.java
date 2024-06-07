@@ -19,12 +19,12 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     String findChatRoomUUID(@Param("id") Long id);
 
     @Query("SELECT new com.example.dating.dto.chat.ChatListDto(c.id, c.otherMember.nickName, c.otherMember.image , MAX(cm.message), MAX(cm.createdAt)) FROM ChatRoom c JOIN ChatMessage cm ON c.id = cm.chatRoomId "
-            + "WHERE c.member.email = :email AND c.type = :type AND (c.member.id = cm.memberId OR c.otherMember.id = cm.memberId) AND c.otherMember.id NOT IN (SELECT b.blockMember.id FROM Block b WHERE b.blockItMember.email = :email) " +
+            + "WHERE c.member.email = :email AND c.type = :type AND (c.member.nickName = cm.nickName OR c.otherMember.nickName = cm.nickName) AND c.otherMember.id NOT IN (SELECT b.blockMember.id FROM Block b WHERE b.blockItMember.email = :email) " +
             "GROUP BY c.id, c.otherMember.nickName, c.member.image")
     List<ChatListDto> findListByMember(@Param("email") String email, @Param("type") String type);
 
     @Query("select new com.example.dating.dto.chat.ChatListDto(c.id, c.member.nickName, c.member.image, MAX(cm.message), MAX(cm.createdAt)) from ChatRoom c join ChatMessage cm on c.id = cm.chatRoomId "
-            +"where c.otherMember.email = :email AND c.type = :type and (c.member.id = cm.memberId or c.otherMember.id = cm.memberId) AND c.member.id NOT IN (SELECT b.blockMember.id FROM Block b WHERE b.blockItMember.email = :email) " +
+            +"where c.otherMember.email = :email AND c.type = :type and (c.member.nickName = cm.nickName or c.otherMember.nickName = cm.nickName) AND c.member.id NOT IN (SELECT b.blockMember.id FROM Block b WHERE b.blockItMember.email = :email) " +
             "GROUP BY c.id, c.member.nickName, c.otherMember.image")
     List<ChatListDto> findListByOtherMember(@Param("email") String email, @Param("type") String type);
 

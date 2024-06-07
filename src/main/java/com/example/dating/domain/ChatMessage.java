@@ -19,7 +19,7 @@ public class ChatMessage {
 
     private Long chatRoomId; // 채팅방 id
 
-    private Long memberId; // 보낸 사용자 id
+    private String nickName; // 보낸 사용자 id
 
     private String message; // 메시지 내용
 
@@ -33,7 +33,7 @@ public class ChatMessage {
 
     public void mapToEntity(ChatMessageDto chatMessageDto) {
         this.chatRoomId = chatMessageDto.getChatRoomId();
-        this.memberId = chatMessageDto.getMemberId();
+        this.nickName = chatMessageDto.getNickName();
         this.message = chatMessageDto.getMessage();
     }
 }

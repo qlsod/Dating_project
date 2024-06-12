@@ -14,9 +14,9 @@ public class ChatOneDto {
 //    private Long id;
 //    private String image;
     private String nickName;
+    private String message;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd-HH:mm:ss", timezone = "Asia/Seoul")
-    private String message;
     private LocalDateTime createAt;
 
     public ChatOneDto(String nickName, String message, LocalDateTime createAt) {

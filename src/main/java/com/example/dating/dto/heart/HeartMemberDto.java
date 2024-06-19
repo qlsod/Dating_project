@@ -7,6 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class HeartMemberDto {
     private Long id;
-    private String name;
+    private String nickName;
     private Integer age;
 }

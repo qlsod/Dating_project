@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class MemberCardDto {
     private Long id;
-    private String name;
+    private String nickName;
     private String address;
     private Integer age;
     private Integer height;

@@ -2,7 +2,6 @@ package com.example.dating.controller;
 
 import com.example.dating.dto.block.BlockListDto;
 import com.example.dating.dto.email.EmailDto;
-import com.example.dating.dto.member.MemberDeviceTokenDto;
 import com.example.dating.service.EmailService;
 import com.example.dating.redis.service.RedisService;
 import com.example.dating.dto.member.MemberJoinDto;

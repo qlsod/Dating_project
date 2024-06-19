@@ -2,6 +2,7 @@ package com.example.dating.controller;
 
 import com.example.dating.dto.block.BlockListDto;
 import com.example.dating.dto.email.EmailDto;
+import com.example.dating.dto.member.MemberDeviceTokenDto;
 import com.example.dating.service.EmailService;
 import com.example.dating.redis.service.RedisService;
 import com.example.dating.dto.member.MemberJoinDto;
@@ -11,6 +12,7 @@ import com.example.dating.security.auth.PrincipalDetails;
 import com.example.dating.security.jwt.TokenInfo;
 import com.example.dating.service.MemberService;
 import com.example.dating.service.ImageService;
+import io.lettuce.core.dynamic.annotation.Param;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -56,6 +58,40 @@ public class MemberController {
             return ResponseEntity.badRequest().body(response);
         }
     }
+
+    // 사용자 device token 저장
+    @PostMapping("/deviceToken")
+    public ResponseEntity<Void> saveDeviceToken(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                                               @RequestParam() String deviceToken) {
+        HashMap<String, String> response = new HashMap<>();
+
+        try {
+            String email = principalDetails.getUsername();
+            // 키, 벨류 형식으로 redis 저장
+            redisService.setDeviceToken(deviceToken, email);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @DeleteMapping("/deviceToken")
+    public ResponseEntity<Void> deleteDeviceToken(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        HashMap<String, String> response = new HashMap<>();
+
+        try {
+            String email = principalDetails.getUsername();
+            // email 키 값을 이용하여 redis 데이터 삭제
+            redisService.delDeviceToken(email);
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    
 
     // 프로필 생성
     @PostMapping("/profile/save")

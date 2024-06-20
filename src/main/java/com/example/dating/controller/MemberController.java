@@ -135,6 +135,11 @@ public class MemberController {
 
     @DeleteMapping("/logout")
     public ResponseEntity<Void> logout(@RequestHeader("RefreshToken") String refreshToken) {
+
+        if (refreshToken == null) {
+            throw new RuntimeException("RefreshToken이 존재하지 않습니다.");
+        }
+
         String refreshTokenValue = redisService.getValues(refreshToken.substring(7));
         if (refreshTokenValue == null) {
             throw new RuntimeException("유효하지 않은 토큰 정보입니다.");

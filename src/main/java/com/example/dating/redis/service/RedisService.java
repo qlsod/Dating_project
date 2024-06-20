@@ -45,6 +45,10 @@ public class RedisService {
 
     // 키-벨류 삭제
     public void delValues(String token) {
-        redisTemplate.delete(token.substring(7));
+        if (!redisTemplate.hasKey(token)) {
+            redisTemplate.delete(token.substring(7));
+        } else {
+            throw new RuntimeException("해당 토큰이 존재하지 않습니다.");
+        }
     }
 }

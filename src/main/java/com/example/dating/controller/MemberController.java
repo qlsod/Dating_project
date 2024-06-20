@@ -136,12 +136,12 @@ public class MemberController {
     @DeleteMapping("/logout")
     public ResponseEntity<Void> logout(@RequestHeader("RefreshToken") String refreshToken) {
         String refreshTokenValue = redisService.getValues(refreshToken.substring(7));
-        if (refreshTokenValue != null) {
-            redisService.delValues(refreshToken);
-            return ResponseEntity.status(HttpStatus.OK).build();
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        if (refreshTokenValue == null) {
+            throw new RuntimeException("유효하지 않은 토큰 정보입니다.");
         }
+        redisService.delValues(refreshToken);
+        return ResponseEntity.status(HttpStatus.OK).build();
+
     }
 
     @PostMapping("/mail/confirm")

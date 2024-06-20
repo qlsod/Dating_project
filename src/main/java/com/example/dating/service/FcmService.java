@@ -23,10 +23,10 @@ public class FcmService {
 
     public void sendPush(FcmSendDto fcmSendDto) {
 
-        Optional<Member> member = memberRepository.findById(fcmSendDto.getTargetUserId());
+        Member member = memberRepository.findByNickName(fcmSendDto.getTargetName());
 
-        if (member.isPresent()) {
-            String deviceToken = redisService.getValues(member.get().getEmail());
+        if (member != null) {
+            String deviceToken = redisService.getValues(member.getEmail());
             if(deviceToken != null) {
                 Notification notification =
                         Notification.builder()

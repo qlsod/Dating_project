@@ -133,14 +133,14 @@ public class MemberController {
         }
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestHeader("RefreshToken") String refreshToken) {
+    @DeleteMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestHeader("RefreshToken") String refreshToken) {
         String refreshTokenValue = redisService.getValues(refreshToken.substring(7));
         if (refreshTokenValue != null) {
             redisService.delValues(refreshToken);
-            return ResponseEntity.ok("로그아웃");
+            return ResponseEntity.status(HttpStatus.OK).build();
         } else {
-            return ResponseEntity.badRequest().body("오류 발생");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 

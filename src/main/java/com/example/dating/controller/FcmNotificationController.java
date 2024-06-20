@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/fcm")
 @RequiredArgsConstructor
@@ -29,7 +31,7 @@ public class FcmNotificationController {
             @ApiResponse(responseCode = "400", description = "실패")
     })
     @PostMapping("")
-    public ResponseEntity<Void> sendNotificationByToken(@RequestBody FcmSendDto fcmSendDto) {
+    public ResponseEntity<Void> sendNotificationByToken(@RequestBody @Valid FcmSendDto fcmSendDto) {
 
         fcmService.sendPush(fcmSendDto);
         return new ResponseEntity<>(HttpStatus.OK);

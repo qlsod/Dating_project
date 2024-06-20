@@ -1,10 +1,12 @@
 package com.example.dating.dto.Fcm;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 @Getter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Schema(description = "/fcm RequestDto")
 public class FcmSendDto {
     private Long targetUserId;
 

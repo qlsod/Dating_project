@@ -21,16 +21,16 @@ public class SettingService {
         String newPassword = changePasswordDto.getNewPassword();
 
         if (!passwordEncoder.matches(changePasswordDto.getCurrentPassword(), findMember.getPassword())) {
-            throw new Exception("입력한 현재 비밀번호가 일치하지 않습니다.");
+            throw new RuntimeException("입력한 현재 비밀번호가 일치하지 않습니다.");
         }
-        if (newPassword.length() < 8) {
-            throw new Exception("새 비밀번호는 8자 이상입니다.");
+        if (newPassword.length() <= 8) {
+            throw new RuntimeException("새 비밀번호는 8자 이상입니다.");
         }
         if (changePasswordDto.getCurrentPassword().equals(newPassword)) {
-            throw new Exception("새 비밀번호는 현재 비밀번호와 같을 수 없습니다.");
+            throw new RuntimeException("새 비밀번호는 현재 비밀번호와 같을 수 없습니다.");
         }
         if (!newPassword.equals(changePasswordDto.getCheckNewPassword())) {
-            throw new Exception("새 비밀번호가 확인 비밀번호와 일치하는지 확인해주세요.");
+            throw new RuntimeException("새 비밀번호가 확인 비밀번호와 일치하는지 확인해주세요.");
         }
 
         String encodePassword = passwordEncoder.encode(newPassword);

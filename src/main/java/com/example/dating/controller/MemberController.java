@@ -12,6 +12,10 @@ import com.example.dating.security.jwt.TokenInfo;
 import com.example.dating.service.MemberService;
 import com.example.dating.service.ImageService;
 import io.lettuce.core.dynamic.annotation.Param;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -59,11 +63,16 @@ public class MemberController {
     }
 
     // 사용자 device token 저장
+    @Operation(summary = "사용자 deviceToken 저장",
+            description = "fcm 위한 deviceToken 저장")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    @SecurityRequirement(name = "accessToken")
     @PostMapping("/deviceToken")
     public ResponseEntity<Void> saveDeviceToken(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                                @RequestParam() String deviceToken) {
-        HashMap<String, String> response = new HashMap<>();
-
         try {
             String email = principalDetails.getUsername();
             // 키, 벨류 형식으로 redis 저장

@@ -3,6 +3,7 @@ package com.example.dating.controller;
 import com.example.dating.dto.setting.ChangePasswordDto;
 import com.example.dating.security.auth.PrincipalDetails;
 import com.example.dating.service.SettingService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,6 +34,7 @@ public class SettingController {
         }
     }
 
+    @SecurityRequirement(name = "accessToken")
     @PostMapping("/password")
     public ResponseEntity<Map<String, String>> changePassword(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                               @Validated @RequestBody ChangePasswordDto changePasswordDto,

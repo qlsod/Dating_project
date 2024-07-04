@@ -16,16 +16,16 @@ public class SettingService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Transactional
-    public void changePassword(String email, ChangePasswordDto changePasswordDto) throws Exception {
+    public void changePassword(String email, ChangePasswordDto changePasswordDto)  {
         Member findMember = memberRepository.findByEmail(email).get();
         String newPassword = changePasswordDto.getNewPassword();
 
         if (!passwordEncoder.matches(changePasswordDto.getCurrentPassword(), findMember.getPassword())) {
             throw new RuntimeException("입력한 현재 비밀번호가 일치하지 않습니다.");
         }
-        if (newPassword.length() <= 8) {
-            throw new RuntimeException("새 비밀번호는 8자 이상입니다.");
-        }
+//        if (newPassword.length() < 8) {
+//            throw new RuntimeException("새 비밀번호는 8자 이상입니다.");
+//        }
         if (changePasswordDto.getCurrentPassword().equals(newPassword)) {
             throw new RuntimeException("새 비밀번호는 현재 비밀번호와 같을 수 없습니다.");
         }

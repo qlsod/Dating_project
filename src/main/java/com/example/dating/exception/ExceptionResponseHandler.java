@@ -3,6 +3,7 @@ package com.example.dating.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
+@Order(value = 1)
 @Slf4j
 @RestController
 @ControllerAdvice
@@ -40,13 +42,13 @@ public class ExceptionResponseHandler {
     // valid 불충
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, Object> validationException(MethodArgumentNotValidException e, HttpServletResponse response) {
+    public Map<String, String> validationException(MethodArgumentNotValidException e, HttpServletResponse response) {
 
         BindingResult bindingResult = e.getBindingResult();
 
-        final Map<String, Object> errorResponse = new HashMap<>();
+        final Map<String, String> errorResponse = new HashMap<String, String>();
 
-        errorResponse.put("errorMessage", "Valid 불충 오류 발생");
+//        errorResponse.put("errorMessage", "Valid 불충 오류 발생");
 
         for (FieldError error : bindingResult.getFieldErrors()) {
             errorResponse.put(error.getField(), error.getDefaultMessage());

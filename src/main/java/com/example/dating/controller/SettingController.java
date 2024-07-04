@@ -41,19 +41,19 @@ public class SettingController {
                                                               BindingResult bindingResult) {
         HashMap<String, String> response = new HashMap<>();
 
-        if (bindingResult.hasErrors()) {
-            response.put("errorMessage", bindingResult.getFieldError().getDefaultMessage());
-            return ResponseEntity.badRequest().body(response);
-        }
+//        if (bindingResult.hasErrors()) {
+//            response.put("errorMessage", bindingResult.getFieldError().getDefaultMessage());
+//            return ResponseEntity.badRequest().body(response);
+//        }
 
-        try {
+//        try {
             String email = principalDetails.getUsername();
             settingService.changePassword(email, changePasswordDto);
             response.put("successMessage", "비밀번호 변경 성공");
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("errorMessage", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
-        }
+//        } catch (Exception e) {
+//            response.put("errorMessage", e.getMessage());
+//            return ResponseEntity.badRequest().body(response);
+
     }
 }

@@ -16,7 +16,7 @@ public class RedisService {
     // 키-벨류 설정
     public void setValues(String token, String email){
         ValueOperations<String, String> values = redisTemplate.opsForValue();
-        values.set(token, email, Duration.ofMinutes(30));
+        values.set(token, email, Duration.ofDays(30));
     }
 
     public void setDeviceToken(String deviceToken, String email) {
@@ -26,7 +26,7 @@ public class RedisService {
             throw new RuntimeException("해당 deviceToken이 이미 존재합니다.");
         }
 
-        values.set(email, deviceToken, Duration.ofMinutes(30));
+        values.set(email, deviceToken, Duration.ofDays(30));
     }
 
     public void delDeviceToken(String email) {

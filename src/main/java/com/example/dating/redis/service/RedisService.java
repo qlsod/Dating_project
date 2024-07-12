@@ -22,10 +22,6 @@ public class RedisService {
     public void setDeviceToken(String deviceToken, String email) {
         ValueOperations<String, String> values = redisTemplate.opsForValue();
 
-        if (redisTemplate.hasKey(email)) {
-            throw new RuntimeException("해당 deviceToken이 이미 존재합니다.");
-        }
-
         values.set(email, deviceToken, Duration.ofDays(30));
     }
 

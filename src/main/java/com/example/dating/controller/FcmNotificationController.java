@@ -1,11 +1,10 @@
 package com.example.dating.controller;
 
-import com.example.dating.dto.Fcm.FcmSendDto;
+import com.example.dating.dto.fcm.FcmSendDto;
 import com.example.dating.service.FcmService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

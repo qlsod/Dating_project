@@ -1,4 +1,4 @@
-package com.example.dating.dto.Fcm;
+package com.example.dating.dto.fcm;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;

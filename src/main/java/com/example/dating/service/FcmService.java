@@ -1,7 +1,7 @@
 package com.example.dating.service;
 
 import com.example.dating.domain.Member;
-import com.example.dating.dto.Fcm.FcmSendDto;
+import com.example.dating.dto.fcm.FcmSendDto;
 import com.example.dating.redis.service.RedisService;
 import com.example.dating.repository.MemberRepository;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -10,7 +10,6 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

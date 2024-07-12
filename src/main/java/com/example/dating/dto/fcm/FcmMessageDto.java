@@ -1,4 +1,4 @@
-package com.example.dating.dto.Fcm;
+package com.example.dating.dto.fcm;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

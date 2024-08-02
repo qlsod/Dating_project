@@ -1,7 +1,9 @@
 package com.example.dating.domain;
 
 import com.example.dating.dto.member.MemberCardDto;
+import com.example.dating.dto.member.MemberCommonDto;
 import com.example.dating.dto.member.MemberInfoDto;
+import com.example.dating.dto.response.HomeResDto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
@@ -53,9 +55,11 @@ public class Member {
         this.likePersonality = memberInfoDto.getLikePersonality();
     }
 
-    public MemberCardDto toMemberCardDto() {
-        return new MemberCardDto(
-                this.id, this.nickName, this.address, this.age, this.height, this.image
+    public MemberCommonDto toMemberCardDto() {
+        return new MemberCommonDto(
+                this.id, this.birthDay, this.nickName, this.description, this.gender, this.address,
+                this.age, this.height, this.image, this.personalInfo, this.personality,
+                this.interest, this.likePersonality
         );
     }
 

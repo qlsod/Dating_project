@@ -2,11 +2,14 @@ package com.example.dating.controller;
 
 import com.example.dating.dto.heart.HeartMemberDto;
 import com.example.dating.dto.member.MemberCardDto;
-import com.example.dating.dto.member.MemberMbtiDto;
+import com.example.dating.dto.response.HomeResDto;
 import com.example.dating.security.auth.PrincipalDetails;
 import com.example.dating.service.AlertService;
 import com.example.dating.service.HeartService;
 import com.example.dating.service.MemberService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,35 +29,45 @@ public class HomeController {
     private final HeartService heartService;
     private final AlertService alertService;
 
+    @Operation(summary = "메인 화면 API",
+            description = "이성 회원 사람 추천 20명, 나한테 관심 있는 사람, 내가 관심 있는 사람 리스트 제공")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
     @GetMapping({"", "/"})
-    public ResponseEntity<Map<String, Object>> home(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        HashMap<String, Object> response = new HashMap<>();
+    public ResponseEntity<HomeResDto> home(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+//        HashMap<String, Object> response = new HashMap<>();
         try {
             String email = principalDetails.getUsername();
 
-            // 회원이 확인하지 않은 알림 개수
-            long notCheckAlert = alertService.countNotCheckAlert(email);
+//            // 회원이 확인하지 않은 알림 개수
+//            long notCheckAlert = alertService.countNotCheckAlert(email);
 
 
+            HomeResDto homeResDto = new HomeResDto();
+
+            homeResDto.setRandomMemberList(memberService.getRandomMemberList(email));
+            homeResDto.setReceiverHeartList(heartService.receiverHeartList(email));
+            homeResDto.setSendHeartList(heartService.sendHeartList(email));
             // 이성 회원 랜덤 20명 추천
-            List<MemberCardDto> randomMemberList = memberService.getRandomMemberList(email);
-//            // mbti 잘 맞는 이성 회원 랜덤 5명 추천
-//            List<MemberMbtiDto> goodMbtiList = memberService.getGoodMbtiList(email, randomMemberList);
-            // 내가 관심 있는 친구
-            List<HeartMemberDto> sendHeartList = heartService.sendHeartList(email);
-            // 나한테 관심 있는 친구
-            List<HeartMemberDto> receiverHeartList = heartService.receiverHeartList(email);
+//            List<MemberCardDto> randomMemberList = memberService.getRandomMemberList(email);
+////            // mbti 잘 맞는 이성 회원 랜덤 5명 추천
+////            List<MemberMbtiDto> goodMbtiList = memberService.getGoodMbtiList(email, randomMemberList);
+//            // 내가 관심 있는 친구
+//            List<HeartMemberDto> sendHeartList = heartService.sendHeartList(email);
+//            // 나한테 관심 있는 친구
+//            List<HeartMemberDto> receiverHeartList = heartService.receiverHeartList(email);
 
-            response.put("randomMemberList", randomMemberList);
-//            response.put("goodMbtiList", goodMbtiList);
-            response.put("notCheckAlert", notCheckAlert);
-            response.put("sendHeartList", sendHeartList);
-            response.put("receiverHeartList", receiverHeartList);
+//            response.put("randomMemberList", randomMemberList);
+////            response.put("goodMbtiList", goodMbtiList);
+//            response.put("notCheckAlert", notCheckAlert);
+//            response.put("sendHeartList", sendHeartList);
+//            response.put("receiverHeartList", receiverHeartList);
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(homeResDto);
         } catch (Exception e) {
-            response.put("errorMessage", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            throw new RuntimeException("뭔가 오류 발생");
         }
     }
 

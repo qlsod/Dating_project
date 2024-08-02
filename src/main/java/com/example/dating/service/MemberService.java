@@ -7,6 +7,7 @@ import com.example.dating.domain.ProfileImage;
 import com.example.dating.dto.block.BlockListDto;
 import com.example.dating.dto.email.EmailDto;
 import com.example.dating.dto.member.*;
+import com.example.dating.dto.response.HomeResDto;
 import com.example.dating.mbti.Mbti;
 import com.example.dating.repository.BlockRepository;
 import com.example.dating.repository.HumanMemberRepository;
@@ -127,7 +128,7 @@ public class MemberService {
     /**
      * 20명의 랜덤 이성 회원을 추천
      */
-    public List<MemberCardDto> getRandomMemberList(String email) {
+    public List<MemberCommonDto> getRandomMemberList(String email) {
         Member findMember = memberRepository.findByEmail(email).get();
 
         log.info(String.valueOf(findMember));

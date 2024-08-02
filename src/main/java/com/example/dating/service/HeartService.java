@@ -4,6 +4,7 @@ import com.example.dating.domain.Alert;
 import com.example.dating.domain.Heart;
 import com.example.dating.domain.Member;
 import com.example.dating.dto.heart.HeartMemberDto;
+import com.example.dating.dto.member.MemberCommonDto;
 import com.example.dating.exception.DuplicateDataException;
 import com.example.dating.exception.EntityNotFoundException;
 import com.example.dating.repository.AlertRepository;
@@ -61,7 +62,7 @@ public class HeartService {
     /**
      * 내가 하트를 보낸 리스트에서 랜덤 5명 조회
      */
-    public List<HeartMemberDto> sendHeartList(String email) {
+    public List<MemberCommonDto> sendHeartList(String email) {
         PageRequest pageable = PageRequest.of(0, 5);
         return heartRepository.findFiveRandomMemberBySender(email, pageable);
     }
@@ -69,7 +70,7 @@ public class HeartService {
     /**
      * 내가 하트를 받은 리스트에서 랜덤 5명 조회
      */
-    public List<HeartMemberDto> receiverHeartList(String email) {
+    public List<MemberCommonDto> receiverHeartList(String email) {
         PageRequest pageable = PageRequest.of(0, 5);
         return heartRepository.findFiveRandomMemberByReceiver(email, pageable);
     }

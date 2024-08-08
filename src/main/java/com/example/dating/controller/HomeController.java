@@ -67,7 +67,7 @@ public class HomeController {
 
             return ResponseEntity.ok(homeResDto);
         } catch (Exception e) {
-            throw new RuntimeException("뭔가 오류 발생");
+            throw new RuntimeException("메인화면 API 오류 발생");
         }
     }
 

@@ -16,7 +16,9 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Order(value = 1)
@@ -42,7 +44,7 @@ public class ExceptionResponseHandler {
     // valid 불충
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> validationException(MethodArgumentNotValidException e, HttpServletResponse response) {
+    public Map<String, List<Map<String, String>>> validationException(MethodArgumentNotValidException e, HttpServletResponse response) {
 
         BindingResult bindingResult = e.getBindingResult();
 
@@ -53,7 +55,17 @@ public class ExceptionResponseHandler {
         for (FieldError error : bindingResult.getFieldErrors()) {
             errorResponse.put(error.getField(), error.getDefaultMessage());
         }
-        return errorResponse;
+
+        // Wrap errorResponse in a list
+        List<Map<String, String>> errorList = new ArrayList<>();
+        errorList.add(errorResponse);
+
+        // Create the final response map
+        final Map<String, List<Map<String, String>>> finalResponse = new HashMap<>();
+        finalResponse.put("ErrorMessage", errorList);
+
+        return finalResponse;
+
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,23 +38,13 @@ public class SettingController {
     @SecurityRequirement(name = "accessToken")
     @PostMapping("/password")
     public ResponseEntity<Map<String, String>> changePassword(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                                              @Validated @RequestBody ChangePasswordDto changePasswordDto,
-                                                              BindingResult bindingResult) {
+                                                              @RequestBody @Valid ChangePasswordDto changePasswordDto) {
         HashMap<String, String> response = new HashMap<>();
 
-//        if (bindingResult.hasErrors()) {
-//            response.put("errorMessage", bindingResult.getFieldError().getDefaultMessage());
-//            return ResponseEntity.badRequest().body(response);
-//        }
-
-//        try {
-            String email = principalDetails.getUsername();
-            settingService.changePassword(email, changePasswordDto);
-            response.put("successMessage", "비밀번호 변경 성공");
-            return ResponseEntity.ok(response);
-//        } catch (Exception e) {
-//            response.put("errorMessage", e.getMessage());
-//            return ResponseEntity.badRequest().body(response);
+        String email = principalDetails.getUsername();
+        settingService.changePassword(email, changePasswordDto);
+        response.put("successMessage", "비밀번호 변경 성공");
+        return ResponseEntity.ok(response);
 
     }
 }

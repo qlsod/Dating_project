@@ -1,16 +1,12 @@
 package com.example.dating.domain;
 
-import com.example.dating.dto.member.MemberCardDto;
 import com.example.dating.dto.member.MemberCommonDto;
 import com.example.dating.dto.member.MemberInfoDto;
-import com.example.dating.dto.response.HomeResDto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Getter

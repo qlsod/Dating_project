@@ -3,6 +3,9 @@ package com.example.dating.controller;
 import com.example.dating.dto.block.BlockListDto;
 import com.example.dating.dto.email.EmailDto;
 import com.example.dating.dto.member.MemberMailDto;
+import com.example.dating.dto.response.member.MemberBlockListRes;
+import com.example.dating.dto.response.member.MemberJoinRes;
+import com.example.dating.dto.response.member.MemberMailRes;
 import com.example.dating.service.EmailService;
 import com.example.dating.redis.service.RedisService;
 import com.example.dating.dto.member.MemberJoinDto;
@@ -12,10 +15,7 @@ import com.example.dating.security.auth.PrincipalDetails;
 import com.example.dating.security.jwt.TokenInfo;
 import com.example.dating.service.MemberService;
 import com.example.dating.service.ImageService;
-import io.lettuce.core.dynamic.annotation.Param;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,32 +45,23 @@ public class MemberController {
     private final MemberRepository memberRepository;
     private final ImageService imageService;
 
+    @Operation(summary = "사용자 회원가입",
+            description = "사용자 email 기반 회원가입을 진행합니다.")
     @PostMapping("/join")
-    public ResponseEntity<Map<String, String>> join(@Validated @RequestBody MemberJoinDto memberJoinDto, BindingResult bindingResult) {
-        HashMap<String, String> response = new HashMap<>();
-
-        if (bindingResult.hasErrors()) {
-            response.put("errorMessage", bindingResult.getFieldError().getDefaultMessage());
-            return ResponseEntity.badRequest().body(response);
-        }
+    public ResponseEntity<MemberJoinRes> join(@Validated @RequestBody MemberJoinDto memberJoinDto) {
 
         try {
             Long memberId = memberService.join(memberJoinDto);
-            response.put("memberId", String.valueOf(memberId));
-            return ResponseEntity.ok(response);
+            MemberJoinRes memberJoinRes = new MemberJoinRes(memberId);
+            return ResponseEntity.ok(memberJoinRes);
         } catch (RuntimeException e) {
-            response.put("errorMessage", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            throw new RuntimeException(e);
         }
     }
 
     // 사용자 device token 저장
     @Operation(summary = "사용자 deviceToken 저장",
             description = "fcm 위한 deviceToken 저장")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "성공"),
-            @ApiResponse(responseCode = "400", description = "실패")
-    })
     @SecurityRequirement(name = "accessToken")
     @PostMapping("/deviceToken")
     public ResponseEntity<Void> saveDeviceToken(@AuthenticationPrincipal PrincipalDetails principalDetails,
@@ -86,6 +77,9 @@ public class MemberController {
         }
     }
 
+    @Operation(summary = "사용자 deviceToken 삭제",
+            description = "로그아웃 및 회원탈퇴 시 fcm 위한 deviceToken 삭제")
+    @SecurityRequirement(name = "accessToken")
     @DeleteMapping("/deviceToken")
     public ResponseEntity<Void> deleteDeviceToken(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         HashMap<String, String> response = new HashMap<>();
@@ -101,9 +95,10 @@ public class MemberController {
         }
     }
 
-    
-
     // 프로필 생성
+    @Operation(summary = "프로필 저장",
+            description = "사용자 프로필을 생성합니다.")
+    @SecurityRequirement(name = "accessToken")
     @PostMapping("/profile/save")
     public ResponseEntity<MemberInfoDto> saveMemberProfile(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                            @RequestBody @Validated MemberInfoDto memberInfoDto) {
@@ -120,18 +115,14 @@ public class MemberController {
             // requestDto 내용 반환
             return ResponseEntity.status(HttpStatus.CREATED).body(memberInfoDto);
         } catch (RuntimeException e) {
-            throw new RuntimeException("저장실패");
+            throw new RuntimeException(e);
         }
     }
 
+    @Operation(summary = "로그인",
+            description = "회원정보 확인 후 JWT 발급합니다.")
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@Validated @RequestBody MemberJoinDto memberJoinDto, BindingResult bindingResult) {
-        HashMap<String, String> response = new HashMap<>();
-
-        if (bindingResult.hasErrors()) {
-            response.put("errorMessage", bindingResult.getFieldError().getDefaultMessage());
-            return ResponseEntity.badRequest().body(response);
-        }
+    public ResponseEntity<TokenInfo> login(@Validated @RequestBody MemberJoinDto memberJoinDto) {
 
         // 로그인 시도
         try {
@@ -139,11 +130,12 @@ public class MemberController {
             redisService.setValues(jwt.getRefreshToken(), memberJoinDto.getEmail());
             return ResponseEntity.ok(jwt);
         } catch (Exception e) {
-            response.put("errorMessage", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            throw new RuntimeException(e);
         }
     }
 
+    @Operation(summary = "로그아웃",
+            description = "회원정보 확인 후 Redis에 저장된 RefreshToken을 삭제합니다.")
     @DeleteMapping("/logout")
     public ResponseEntity<Void> logout(@RequestHeader("RefreshToken") String refreshToken) {
 
@@ -160,164 +152,154 @@ public class MemberController {
 
     }
 
+    @Operation(summary = "메일인증",
+            description = "사용자 email로 랜덤난수 생성하여 보냅니다.")
     @PostMapping("/mail/confirm")
-    public ResponseEntity<Map<String, String>> mailConfirm(@RequestBody @Valid MemberMailDto memberMailDto) {
-        HashMap<String, String> response = new HashMap<>();
-
-//        String email = emailDto.getEmail();
+    public ResponseEntity<MemberMailRes> mailConfirm(@RequestBody @Valid MemberMailDto memberMailDto) {
         try {
-            // 해당 이메일로 된 계정이 존재하지 않으면
-//            if (memberRepository.findByEmail(email).isEmpty()) {
-//                response.put("errorMessage", "일치하는 계정이 없습니다.");
-//                return ResponseEntity.badRequest().body(response);
-//            }
             // 존재하면 인증 번호를 메일로 전송
             String email = memberMailDto.getEmail();
             String code = emailService.sendEmail(email);
-            response.put("code", code);
-            return ResponseEntity.ok(response);
+            MemberMailRes mailRes = new MemberMailRes(code);
+            return ResponseEntity.ok(mailRes);
         } catch (MessagingException | UnsupportedEncodingException e) {
-            response.put("errorMessage", "메일 전송 실패");
-            return ResponseEntity.badRequest().body(response);
+            throw new RuntimeException(e);
         }
     }
 
-    @PostMapping("/password/update")
-    public ResponseEntity<Map<String, String>> updatePassword(@RequestBody EmailDto emailDto) {
-        HashMap<String, String> response = new HashMap<>();
-        try {
-            memberService.updatePassword(emailDto);
-            response.put("successMessage", "패스워드 변경 성공");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("errorMessage", "패스워드 변경 실패");
-            return ResponseEntity.badRequest().body(response);
-        }
-    }
+//    @PostMapping("/password/update")
+//    public ResponseEntity<Map<String, String>> updatePassword(@RequestBody EmailDto emailDto) {
+//        HashMap<String, String> response = new HashMap<>();
+//        try {
+//            memberService.updatePassword(emailDto);
+//            response.put("successMessage", "패스워드 변경 성공");
+//            return ResponseEntity.ok(response);
+//        } catch (Exception e) {
+//            response.put("errorMessage", "패스워드 변경 실패");
+//            return ResponseEntity.badRequest().body(response);
+//        }
+//    }
 
+    @Operation(summary = "본인 프로필 조회",
+            description = "사용자 본인 프로필 조회")
+    @SecurityRequirement(name = "accessToken")
     @GetMapping("/profile")
-    public ResponseEntity<Object> getMemberProfile(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+    public ResponseEntity<MemberInfoDto> getMemberProfile(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         try {
             MemberInfoDto memberProfile = memberService.getMemberProfile(principalDetails.getUsername());
             return ResponseEntity.ok(memberProfile);
-        } catch (Exception e) {
-            HashMap<String, String> response = new HashMap<>();
-            response.put("errorMessage", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
         }
     }
 
+    @Operation(summary = "타인 프로필 조회",
+            description = "타켓 사용자 프로필 조회")
     @GetMapping("/profile/{id}")
-    public ResponseEntity<Object> getOtherMemberProfile(@PathVariable Long id) {
+    public ResponseEntity<MemberInfoDto> getOtherMemberProfile(@PathVariable Long id) {
         try {
             MemberInfoDto otherMemberProfile = memberService.getMemberProfile(id);
             return ResponseEntity.ok(otherMemberProfile);
-        } catch (Exception e) {
-            HashMap<String, String> response = new HashMap<>();
-            response.put("errorMessage", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
         }
     }
 
     // 휴먼유저는 추천에만 안 뜨게.. 설정한 뒤에 로그인하면 자동으로 휴먼계정 해제
+    @Operation(summary = "휴먼유저 설정",
+            description = "사용자 본인을 휴먼유저로 전환합니다.")
+    @SecurityRequirement(name = "accessToken")
     @PostMapping("/humanUser")
-    public ResponseEntity<Map<String, String>> humanMember(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        HashMap<String, String> response = new HashMap<>();
+    public ResponseEntity<Void> humanMember(@AuthenticationPrincipal PrincipalDetails principalDetails) {
 
         try {
             String email = principalDetails.getUsername();
             memberService.addHumanMember(email);
 
-            response.put("successMessage", "휴먼계정 전환 성공");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("errorMessage", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
         }
     }
 
     // 차단은 했고 이제 차단당한 사람과 차단한 사람이 서로 보이지 않도록 해야한다..!!
+    @Operation(summary = "다른 사용자 차단",
+            description = "타켓 사용자를 차단처리합니다.")
+    @SecurityRequirement(name = "accessToken")
     @PostMapping("/block/{id}")
-    public ResponseEntity<Map<String, String>> blockMember(@PathVariable Long id,
+    public ResponseEntity<Void> blockMember(@PathVariable Long id,
                                                            @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        HashMap<String, String> response = new HashMap<>();
+
         try {
             String username = principalDetails.getUsername();
             memberService.block(id, username);
-            response.put("successMessage", "차단되었습니다.");
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
-            response.put("errorMessage", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            throw new RuntimeException(e);
         }
     }
 
+    @Operation(summary = "차단 사용자 목록 조회",
+            description = "사용자 본인이 차단한 사용자의 목록을 조회합니다.")
+    @SecurityRequirement(name = "accessToken")
     @GetMapping("/block")
-    public ResponseEntity<Map<String, Object>> blockMemberList(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+    public ResponseEntity<MemberBlockListRes> blockMemberList(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         HashMap<String, Object> response = new HashMap<>();
 
         try {
             String email = principalDetails.getUsername();
             List<BlockListDto> blockMemberList = memberService.getBlockMemberList(email);
-            response.put("blockMemberList",  blockMemberList);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("errorMessage", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+
+            MemberBlockListRes blockListRes = new MemberBlockListRes();
+            blockListRes.setBlockMemberList(blockMemberList);
+            return ResponseEntity.ok(blockListRes);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
         }
     }
 
     // 차단 해제
+    @Operation(summary = "다른 사용자 차단 해제",
+            description = "타켓 사용자의 차단을 해제합니다.")
+    @SecurityRequirement(name = "accessToken")
     @PostMapping("nonblock/{id}")
-    public ResponseEntity<Map<String, String>> cancelBlockMember(@AuthenticationPrincipal PrincipalDetails principalDetails,
+    public ResponseEntity<Void> cancelBlockMember(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                                  @PathVariable Long id) {
-        HashMap<String, String> response = new HashMap<>();
-
         try {
             String email = principalDetails.getUsername();
             memberService.deleteBlockMember(email, id);
-            response.put("successMessage", "차단이 해제됨");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("errorMessage", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
         }
     }
 
+    @Operation(summary = "프로필 수정",
+            description = "사용자 프로필을 수정합니다.")
+    @SecurityRequirement(name = "accessToken")
     @PostMapping("/profile/update")
-    public ResponseEntity<Map<String, String>> updateMemberProfile(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                                                   @Validated @RequestBody MemberInfoDto memberInfoDto,
-                                                                   BindingResult bindingResult) {
-        HashMap<String, String> response = new HashMap<>();
-
-        if (bindingResult.hasErrors()) {
-            response.put("errorMessage", bindingResult.getFieldError().getDefaultMessage());
-            return ResponseEntity.badRequest().body(response);
-        }
-
+    public ResponseEntity<MemberInfoDto> updateMemberProfile(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                                                   @Validated @RequestBody MemberInfoDto memberInfoDto) {
         try {
             memberService.updateMemberProfile(principalDetails.getUsername(), memberInfoDto);
-            response.put("successMessage", "프로필 수정 성공");
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(memberInfoDto);
         } catch (RuntimeException e) {
-            response.put("errorMessage", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            throw new RuntimeException(e);
         }
     }
 
+    @Operation(summary = "회원 탈퇴",
+            description = "사용자 정보를 전부 삭제합니다.")
+    @SecurityRequirement(name = "accessToken")
     @DeleteMapping("/delete")
-    public ResponseEntity<Map<String, String>> deleteMember(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        HashMap<String, String> response = new HashMap<>();
+    public ResponseEntity<Void> deleteMember(@AuthenticationPrincipal PrincipalDetails principalDetails) {
 
         try {
             String email = principalDetails.getUsername();
             memberService.deleteMember(email);
-
-            response.put("successMessage", "회원 삭제 완료");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("errorMessage", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
         }
     }
 }

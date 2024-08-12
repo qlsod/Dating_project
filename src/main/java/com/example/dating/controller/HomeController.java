@@ -1,8 +1,7 @@
 package com.example.dating.controller;
 
-import com.example.dating.dto.heart.HeartMemberDto;
 import com.example.dating.dto.member.MemberCardDto;
-import com.example.dating.dto.response.HomeResDto;
+import com.example.dating.dto.response.HomeRes;
 import com.example.dating.security.auth.PrincipalDetails;
 import com.example.dating.service.AlertService;
 import com.example.dating.service.HeartService;
@@ -36,7 +35,7 @@ public class HomeController {
             @ApiResponse(responseCode = "400", description = "실패")
     })
     @GetMapping({"", "/"})
-    public ResponseEntity<HomeResDto> home(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+    public ResponseEntity<HomeRes> home(@AuthenticationPrincipal PrincipalDetails principalDetails) {
 //        HashMap<String, Object> response = new HashMap<>();
         try {
             String email = principalDetails.getUsername();
@@ -45,11 +44,11 @@ public class HomeController {
 //            long notCheckAlert = alertService.countNotCheckAlert(email);
 
 
-            HomeResDto homeResDto = new HomeResDto();
+            HomeRes homeRes = new HomeRes();
 
-            homeResDto.setRandomMemberList(memberService.getRandomMemberList(email));
-            homeResDto.setReceiverHeartList(heartService.receiverHeartList(email));
-            homeResDto.setSendHeartList(heartService.sendHeartList(email));
+            homeRes.setRandomMemberList(memberService.getRandomMemberList(email));
+            homeRes.setReceiverHeartList(heartService.receiverHeartList(email));
+            homeRes.setSendHeartList(heartService.sendHeartList(email));
             // 이성 회원 랜덤 20명 추천
 //            List<MemberCardDto> randomMemberList = memberService.getRandomMemberList(email);
 ////            // mbti 잘 맞는 이성 회원 랜덤 5명 추천
@@ -65,7 +64,7 @@ public class HomeController {
 //            response.put("sendHeartList", sendHeartList);
 //            response.put("receiverHeartList", receiverHeartList);
 
-            return ResponseEntity.ok(homeResDto);
+            return ResponseEntity.ok(homeRes);
         } catch (Exception e) {
             throw new RuntimeException("메인화면 API 오류 발생");
         }

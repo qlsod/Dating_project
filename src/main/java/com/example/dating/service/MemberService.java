@@ -7,8 +7,6 @@ import com.example.dating.domain.ProfileImage;
 import com.example.dating.dto.block.BlockListDto;
 import com.example.dating.dto.email.EmailDto;
 import com.example.dating.dto.member.*;
-import com.example.dating.dto.response.HomeResDto;
-import com.example.dating.mbti.Mbti;
 import com.example.dating.repository.BlockRepository;
 import com.example.dating.repository.HumanMemberRepository;
 import com.example.dating.repository.MemberRepository;
@@ -28,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 

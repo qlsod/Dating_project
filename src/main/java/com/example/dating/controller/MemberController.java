@@ -2,6 +2,7 @@ package com.example.dating.controller;
 
 import com.example.dating.dto.block.BlockListDto;
 import com.example.dating.dto.email.EmailDto;
+import com.example.dating.dto.member.MemberMailDto;
 import com.example.dating.service.EmailService;
 import com.example.dating.redis.service.RedisService;
 import com.example.dating.dto.member.MemberJoinDto;
@@ -26,6 +27,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
+import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
@@ -159,8 +161,9 @@ public class MemberController {
     }
 
     @PostMapping("/mail/confirm")
-    public ResponseEntity<Map<String, String>> mailConfirm(@RequestParam String email) {
+    public ResponseEntity<Map<String, String>> mailConfirm(@RequestBody @Valid MemberMailDto memberMailDto) {
         HashMap<String, String> response = new HashMap<>();
+
 //        String email = emailDto.getEmail();
         try {
             // 해당 이메일로 된 계정이 존재하지 않으면
@@ -169,6 +172,7 @@ public class MemberController {
 //                return ResponseEntity.badRequest().body(response);
 //            }
             // 존재하면 인증 번호를 메일로 전송
+            String email = memberMailDto.getEmail();
             String code = emailService.sendEmail(email);
             response.put("code", code);
             return ResponseEntity.ok(response);

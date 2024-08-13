@@ -51,13 +51,13 @@ public class Member {
         this.likePersonality = memberInfoDto.getLikePersonality();
     }
 
-    public MemberCommonDto toMemberCardDto() {
-        return new MemberCommonDto(
-                this.id, this.birthDay, this.nickName, this.description, this.gender, this.address,
-                this.age, this.height, this.image, this.personalInfo, this.personality,
-                this.interest, this.likePersonality
-        );
-    }
+//    public MemberCommonDto toMemberCardDto() {
+//        return new MemberCommonDto(
+//                this.id, this.birthDay, this.nickName, this.description, this.gender, this.address,
+//                this.age, this.height, this.image, this.personalInfo, this.personality,
+//                this.interest, this.likePersonality
+//        );
+//    }
 
     public Member(String email, String password) {
         this.email = email;

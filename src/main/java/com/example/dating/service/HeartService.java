@@ -3,6 +3,7 @@ package com.example.dating.service;
 import com.example.dating.domain.Alert;
 import com.example.dating.domain.Heart;
 import com.example.dating.domain.Member;
+import com.example.dating.domain.ProfileImage;
 import com.example.dating.dto.heart.HeartMemberDto;
 import com.example.dating.dto.member.MemberCommonDto;
 import com.example.dating.exception.DuplicateDataException;
@@ -10,14 +11,18 @@ import com.example.dating.exception.EntityNotFoundException;
 import com.example.dating.repository.AlertRepository;
 import com.example.dating.repository.HeartRepository;
 import com.example.dating.repository.MemberRepository;
+import com.example.dating.repository.ProfileImagesRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +31,7 @@ public class HeartService {
     private final HeartRepository heartRepository;
     private final MemberRepository memberRepository;
     private final AlertRepository alertRepository;
+    private final ProfileImagesRepository profileImagesRepository;
 
     /**
      * 하트를 보낸 사람과 받은 사람을 저장
@@ -64,7 +70,26 @@ public class HeartService {
      */
     public List<MemberCommonDto> sendHeartList(String email) {
         PageRequest pageable = PageRequest.of(0, 5);
-        return heartRepository.findFiveRandomMemberBySender(email, pageable);
+        List<Member> members = heartRepository.findFiveRandomMemberBySender(email, pageable);
+
+        List<Long> memberIds = members.stream()
+                .map(Member::getId)
+                .collect(Collectors.toList());
+
+        // 2단계: 프로필 이미지 목록 조회
+        List<ProfileImage> profileImages = profileImagesRepository.findProfileImagesByMemberIds(memberIds);
+
+        // 이미지 목록을 회원과 매핑
+        Map<Long, List<String>> imagesByMemberId = profileImages.stream()
+                .collect(Collectors.groupingBy(
+                        pi -> pi.getMember().getId(),
+                        Collectors.mapping(ProfileImage::getImage, Collectors.toList())
+                ));
+
+        return members.stream().map(member -> {
+            List<String> images = imagesByMemberId.getOrDefault(member.getId(), Collections.emptyList());
+            return new MemberCommonDto(member, images);
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -72,6 +97,26 @@ public class HeartService {
      */
     public List<MemberCommonDto> receiverHeartList(String email) {
         PageRequest pageable = PageRequest.of(0, 5);
-        return heartRepository.findFiveRandomMemberByReceiver(email, pageable);
+        List<Member> members = heartRepository.findFiveRandomMemberByReceiver(email, pageable);
+
+        List<Long> memberIds = members.stream()
+                .map(Member::getId)
+                .collect(Collectors.toList());
+
+        // 2단계: 프로필 이미지 목록 조회
+        List<ProfileImage> profileImages = profileImagesRepository.findProfileImagesByMemberIds(memberIds);
+
+        // 이미지 목록을 회원과 매핑
+        Map<Long, List<String>> imagesByMemberId = profileImages.stream()
+                .collect(Collectors.groupingBy(
+                        pi -> pi.getMember().getId(),
+                        Collectors.mapping(ProfileImage::getImage, Collectors.toList())
+                ));
+
+        return members.stream().map(member -> {
+            List<String> images = imagesByMemberId.getOrDefault(member.getId(), Collections.emptyList());
+            return new MemberCommonDto(member, images);
+        }).collect(Collectors.toList());
+
     }
 }

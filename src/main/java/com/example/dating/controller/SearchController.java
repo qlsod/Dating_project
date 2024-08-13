@@ -8,6 +8,8 @@ import com.example.dating.dto.search.SearchRes;
 import com.example.dating.repository.MemberRepository;
 import com.example.dating.repository.SearchRepository;
 import com.example.dating.security.auth.PrincipalDetails;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -30,8 +32,12 @@ public class SearchController {
     private final MemberRepository memberRepository;
     private final SearchRepository searchRepository;
 
+    @Operation(summary = "탐색창 글쓰기",
+            description = "해당 사용자가 작성한 글을 저장합니다.")
+    @SecurityRequirement(name = "accessToken")
     @PostMapping("")
-    public ResponseEntity<SearchDto> postSearch(@AuthenticationPrincipal PrincipalDetails principalDetails, @RequestBody @Valid SearchDto searchDto) {
+    public ResponseEntity<SearchDto> postSearch(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                                @RequestBody @Valid SearchDto searchDto) {
 
         try {
             // 유저 email 꺼내기
@@ -45,10 +51,12 @@ public class SearchController {
 
             return ResponseEntity.status(HttpStatus.CREATED).body(searchDto);
         } catch (Exception e) {
-            throw new RuntimeException("search중 오류 발생", e);
+            throw new RuntimeException(e);
         }
     }
 
+    @Operation(summary = "탐색창 List 전체 조회",
+            description = "모든 탐색창 글을 조회합니다.")
     @GetMapping("")
     public ResponseEntity<List<SearchRes>> getSearch() {
         List<Search> searchList = searchRepository.findAll();
@@ -65,6 +73,9 @@ public class SearchController {
 
     }
 
+    @Operation(summary = "탐색창 세부 조회",
+            description = "타켓 탐색창 글의 id를 입력받아 세부 내용을 조회합니다.")
+    @SecurityRequirement(name = "accessToken")
     @GetMapping("/{id}")
     public ResponseEntity<SearchDetailRes> getSearchDetail(@PathVariable Long id) {
 

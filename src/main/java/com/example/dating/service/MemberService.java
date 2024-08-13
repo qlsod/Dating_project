@@ -23,9 +23,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -132,9 +131,26 @@ public class MemberService {
 
         PageRequest pageRequest = PageRequest.of(0, 20);
 //        return memberRepository.findRandomMember(findMember.getId(), findMember.getGender(), pageRequest);
-        List<Member> result = memberRepository.findRandomRecommendMemberList(findMember.getGender(), pageRequest);
-        return result.stream().map(Member::toMemberCardDto).collect(toList());
+        List<Member> members = memberRepository.findRandomRecommendMemberList(findMember.getGender(), pageRequest);
 
+        List<Long> memberIds = members.stream()
+                .map(Member::getId)
+                .collect(Collectors.toList());
+
+        // 2단계: 프로필 이미지 목록 조회
+        List<ProfileImage> profileImages = profileImagesRepository.findProfileImagesByMemberIds(memberIds);
+
+        // 이미지 목록을 회원과 매핑
+        Map<Long, List<String>> imagesByMemberId = profileImages.stream()
+                .collect(Collectors.groupingBy(
+                        pi -> pi.getMember().getId(),
+                        Collectors.mapping(ProfileImage::getImage, Collectors.toList())
+                ));
+
+        return members.stream().map(member -> {
+            List<String> images = imagesByMemberId.getOrDefault(member.getId(), Collections.emptyList());
+            return new MemberCommonDto(member, images);
+        }).collect(Collectors.toList());
 
     }
 

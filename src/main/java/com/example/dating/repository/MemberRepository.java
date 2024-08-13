@@ -1,6 +1,7 @@
 package com.example.dating.repository;
 
 import com.example.dating.domain.Member;
+import com.example.dating.domain.ProfileImage;
 import com.example.dating.domain.Search;
 import com.example.dating.dto.member.MemberCardDto;
 import com.example.dating.dto.member.MemberInviteDto;
@@ -54,4 +55,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query(value = "SELECT m FROM Member m WHERE NOT m.gender = :gender")
     List<Member> findRandomRecommendMemberList(@Param("gender") String gender, Pageable pageable);
+
+
+    @Query("SELECT pi FROM ProfileImage pi WHERE pi.member.id IN :memberIds")
+    List<ProfileImage> findProfileImagesByMemberIds(@Param("memberIds") List<Long> memberIds);
+
 }

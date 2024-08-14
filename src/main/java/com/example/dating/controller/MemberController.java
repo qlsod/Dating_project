@@ -2,6 +2,7 @@ package com.example.dating.controller;
 
 import com.example.dating.dto.block.BlockListDto;
 import com.example.dating.dto.email.EmailDto;
+import com.example.dating.dto.member.MemberCommonDto;
 import com.example.dating.dto.member.MemberMailDto;
 import com.example.dating.dto.response.member.MemberBlockListRes;
 import com.example.dating.dto.response.member.MemberJoinRes;
@@ -184,21 +185,33 @@ public class MemberController {
             description = "사용자 본인 프로필 조회")
     @SecurityRequirement(name = "accessToken")
     @GetMapping("/profile")
-    public ResponseEntity<MemberInfoDto> getMemberProfile(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+    public ResponseEntity<MemberCommonDto> getMemberProfile(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         try {
-            MemberInfoDto memberProfile = memberService.getMemberProfile(principalDetails.getUsername());
+            MemberCommonDto memberProfile = memberService.getMemberProfileByEmail(principalDetails.getUsername());
             return ResponseEntity.ok(memberProfile);
         } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }
     }
 
-    @Operation(summary = "타인 프로필 조회",
-            description = "타켓 사용자 프로필 조회")
-    @GetMapping("/profile/{id}")
-    public ResponseEntity<MemberInfoDto> getOtherMemberProfile(@PathVariable Long id) {
+    @Operation(summary = "타인 프로필 조회(uuid) - 추후 수정 예정",
+            description = "uuid 이용한 타켓 사용자 프로필 조회")
+    @GetMapping("/profile/another/{id}")
+    public ResponseEntity<MemberCommonDto> getOtherMemberProfileByUUID(@PathVariable Long id) {
         try {
-            MemberInfoDto otherMemberProfile = memberService.getMemberProfile(id);
+            MemberCommonDto otherMemberProfile = memberService.getMemberProfileById(id);
+            return ResponseEntity.ok(otherMemberProfile);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Operation(summary = "타인 프로필 조회(닉네임)",
+            description = "닉네임 이용한 타켓 사용자 프로필 조회")
+    @GetMapping("/profile/another/nick-name")
+    public ResponseEntity<MemberCommonDto> getOtherMemberProfileByNickName(@RequestParam("nickName") String nickName) {
+        try {
+            MemberCommonDto otherMemberProfile = memberService.getMemberProfileByName(nickName);
             return ResponseEntity.ok(otherMemberProfile);
         } catch (RuntimeException e) {
             throw new RuntimeException(e);

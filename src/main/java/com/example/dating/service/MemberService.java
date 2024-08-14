@@ -176,9 +176,16 @@ public class MemberService {
         return memberRepository.findReceiverHeartList(email);
     }
 
-    public MemberInfoDto getMemberProfile(String email) {
-        Member findMember = memberRepository.findByEmail(email).get();
+    // 유저 가입여부 판단 메소드
+    public void checkMemberExists(Member member) {
+        if (member == null) {
+            throw new NullPointerException("해당 유저는 가입되어 있지 않습니다.");
+        }
+    }
 
+    public MemberCommonDto getMemberProfileByName(String nickName) {
+        Member findMember = memberRepository.findByNickName(nickName);
+        checkMemberExists(findMember);
         List<ProfileImage> profileImages = profileImagesRepository.findAllByMemberId(findMember.getId());
 
         // 이미지 URL 리스트를 생성하여 DTO에 추가
@@ -187,19 +194,35 @@ public class MemberService {
             imageUrls.add(profileImage.getImage());
         }
 
-        MemberInfoDto memberInfoDto = new MemberInfoDto();
-        memberInfoDto.mapEntityToDto(findMember);
-        memberInfoDto.setImages(imageUrls);
-
-        return memberInfoDto;
+        return new MemberCommonDto(findMember, imageUrls);
     }
 
-    public MemberInfoDto getMemberProfile(Long id) {
+    public MemberCommonDto getMemberProfileById(Long id) {
         Member findMember = memberRepository.findById(id).get();
+        checkMemberExists(findMember);
+        List<ProfileImage> profileImages = profileImagesRepository.findAllByMemberId(findMember.getId());
 
-        MemberInfoDto memberInfoDto = new MemberInfoDto();
-        memberInfoDto.mapEntityToDto(findMember);
-        return memberInfoDto;
+        // 이미지 URL 리스트를 생성하여 DTO에 추가
+        List<String> imageUrls = new ArrayList<>();
+        for (ProfileImage profileImage : profileImages) {
+            imageUrls.add(profileImage.getImage());
+        }
+
+        return new MemberCommonDto(findMember, imageUrls);
+    }
+
+    public MemberCommonDto getMemberProfileByEmail(String email) {
+        Member findMember = memberRepository.findIdByEmail(email);
+        checkMemberExists(findMember);
+        List<ProfileImage> profileImages = profileImagesRepository.findAllByMemberId(findMember.getId());
+
+        // 이미지 URL 리스트를 생성하여 DTO에 추가
+        List<String> imageUrls = new ArrayList<>();
+        for (ProfileImage profileImage : profileImages) {
+            imageUrls.add(profileImage.getImage());
+        }
+
+        return new MemberCommonDto(findMember, imageUrls);
     }
 
     @Transactional

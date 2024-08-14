@@ -119,6 +119,14 @@ public class MemberService {
         profileImagesRepository.saveAll(profileImages);
     }
 
+    // 닉네임 존재 여부 확인
+    public void checkNameExist(String nickName) {
+        Member member = memberRepository.findByNickName(nickName);
+        if(member != null) {
+            throw new RuntimeException("해당 닉네임이 존재합니다.");
+        }
+    }
+
 
 
     /**

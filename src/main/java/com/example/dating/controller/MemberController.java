@@ -105,6 +105,9 @@ public class MemberController {
                                                            @RequestBody @Validated MemberInfoDto memberInfoDto) {
 
         try {
+
+            memberService.checkNameExist(memberInfoDto.getNickName());
+
             String email = principalDetails.getUsername();
 
             /** 해당 이미지들을 저장하는 메소드
@@ -115,6 +118,20 @@ public class MemberController {
 
             // requestDto 내용 반환
             return ResponseEntity.status(HttpStatus.CREATED).body(memberInfoDto);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Operation(summary = "프로필 수정",
+            description = "사용자 프로필을 수정합니다.")
+    @SecurityRequirement(name = "accessToken")
+    @PostMapping("/profile/update")
+    public ResponseEntity<MemberInfoDto> updateMemberProfile(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                                             @Validated @RequestBody MemberInfoDto memberInfoDto) {
+        try {
+            memberService.updateMemberProfile(principalDetails.getUsername(), memberInfoDto);
+            return ResponseEntity.ok(memberInfoDto);
         } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }
@@ -287,19 +304,7 @@ public class MemberController {
         }
     }
 
-    @Operation(summary = "프로필 수정",
-            description = "사용자 프로필을 수정합니다.")
-    @SecurityRequirement(name = "accessToken")
-    @PostMapping("/profile/update")
-    public ResponseEntity<MemberInfoDto> updateMemberProfile(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                                                   @Validated @RequestBody MemberInfoDto memberInfoDto) {
-        try {
-            memberService.updateMemberProfile(principalDetails.getUsername(), memberInfoDto);
-            return ResponseEntity.ok(memberInfoDto);
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
-        }
-    }
+
 
     @Operation(summary = "회원 탈퇴",
             description = "사용자 정보를 전부 삭제합니다.")

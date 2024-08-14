@@ -45,6 +45,7 @@ public class SecurityConfig {
                                         "/swagger-resources/**", "/configuration/ui", "/configuration/security", "/swagger-ui/**",
                                         "/webjars/**", "/swagger-ui.html").permitAll()
                                 .antMatchers("/h2-console/**").permitAll()
+                                .antMatchers(HttpMethod.GET, "/member/profile/another/**").permitAll()
                                 .anyRequest().authenticated())
                 .addFilterBefore(new JwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .build();

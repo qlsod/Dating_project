@@ -30,10 +30,6 @@ public class HomeController {
 
     @Operation(summary = "메인 화면 API",
             description = "이성 회원 사람 추천 20명, 나한테 관심 있는 사람, 내가 관심 있는 사람 리스트 제공")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공"),
-            @ApiResponse(responseCode = "400", description = "실패")
-    })
     @GetMapping({"", "/"})
     public ResponseEntity<HomeRes> home(@AuthenticationPrincipal PrincipalDetails principalDetails) {
 //        HashMap<String, Object> response = new HashMap<>();

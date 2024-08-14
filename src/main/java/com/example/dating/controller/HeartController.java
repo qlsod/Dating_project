@@ -4,6 +4,8 @@ import com.example.dating.exception.DuplicateDataException;
 import com.example.dating.exception.EntityNotFoundException;
 import com.example.dating.security.auth.PrincipalDetails;
 import com.example.dating.service.HeartService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,17 +22,16 @@ public class HeartController {
 
     private final HeartService heartService;
 
+    @Operation(summary = "하트 보내기",
+            description = "다른 사용자의 uuid 받아 하트 저장")
+    @SecurityRequirement(name = "accessToken")
     @PostMapping("/heart/add")
-    public ResponseEntity<Map<String, String>> heart(@RequestParam Long id, @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        HashMap<String, String> response = new HashMap<>();
-
+    public ResponseEntity<Void> heart(@RequestParam Long id, @AuthenticationPrincipal PrincipalDetails principalDetails) {
         try {
             heartService.heart(id, principalDetails.getUsername());
-            response.put("successMessage", "하트 보내기 성공");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("errorMessage", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
         }
     }
 }

@@ -7,10 +7,7 @@ import com.example.dating.domain.ProfileImage;
 import com.example.dating.dto.block.BlockListDto;
 import com.example.dating.dto.email.EmailDto;
 import com.example.dating.dto.member.*;
-import com.example.dating.repository.BlockRepository;
-import com.example.dating.repository.HumanMemberRepository;
-import com.example.dating.repository.MemberRepository;
-import com.example.dating.repository.ProfileImagesRepository;
+import com.example.dating.repository.*;
 import com.example.dating.security.jwt.TokenInfo;
 import com.example.dating.security.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -92,9 +89,9 @@ public class MemberService {
     @Transactional
     public void save(String email, MemberInfoDto memberInfoDto) {
         Optional<Member> memberOptional = memberRepository.findByEmail(email);
-
-        memberOptional.ifPresentOrElse(member -> member.mapDtoToEntity(memberInfoDto),
-               () -> { throw new RuntimeException("회원이 존재하지 않습니다."); });
+        memberOptional.ifPresentOrElse(member ->
+                member.mapDtoToEntity(memberInfoDto), ()
+                -> { throw new RuntimeException("회원이 존재하지 않습니다."); });
     }
 
 
@@ -103,10 +100,45 @@ public class MemberService {
      */
     @Transactional
     public void saveProfileImages(String email, MemberInfoDto memberInfoDto) {
+        Member member = memberRepository.findByEmail(email).get();
 
-        // 이메일로 회원 조회
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> { throw new RuntimeException("회원이 존재하지 않습니다."); });
+        // 회원 조회
+        checkMemberExists(member);
+
+        // 닉네임 중복 여부 조회
+        checkNameExist(memberInfoDto.getNickName());
+
+        // 이미지 URL 리스트 가져오기
+        List<String> imageUrls = memberInfoDto.getImages();
+
+        // 이미지 URL들을 ProfileImage 엔티티로 생성하여 저장
+        List<ProfileImage> profileImages = imageUrls.stream()
+                .map(imageUrl -> new ProfileImage(member, imageUrl))
+                .collect(toList());
+
+        profileImagesRepository.saveAll(profileImages);
+    }
+
+    /**
+     * 수정한 프로필 사진들 저장
+     */
+    @Transactional
+    public void updateProfileImages(String email, MemberInfoDto memberInfoDto) {
+        Member member = memberRepository.findByEmail(email).get();
+
+        // 회원 조회
+        checkMemberExists(member);
+
+        // 닉네임 중복 여부 조회
+        checkNameExist(memberInfoDto.getNickName());
+
+        // 해당 회원의 저장된 이미지 URL 리스트 가져오기
+        List<ProfileImage> existingProfileImages = profileImagesRepository.findAllByMemberId(member.getId());
+
+        // 기존 이미지 존재할 시 삭제
+        if (!existingProfileImages.isEmpty()) {
+            profileImagesRepository.deleteAll(existingProfileImages);
+        }
 
         // 이미지 URL 리스트 가져오기
         List<String> imageUrls = memberInfoDto.getImages();

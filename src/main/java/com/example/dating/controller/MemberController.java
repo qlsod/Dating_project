@@ -1,5 +1,6 @@
 package com.example.dating.controller;
 
+import com.example.dating.domain.Member;
 import com.example.dating.dto.block.BlockListDto;
 import com.example.dating.dto.email.EmailDto;
 import com.example.dating.dto.member.MemberCommonDto;
@@ -106,8 +107,6 @@ public class MemberController {
 
         try {
 
-            memberService.checkNameExist(memberInfoDto.getNickName());
-
             String email = principalDetails.getUsername();
 
             /** 해당 이미지들을 저장하는 메소드
@@ -134,9 +133,20 @@ public class MemberController {
     public ResponseEntity<MemberInfoDto> updateMemberProfile(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                              @Validated @RequestBody MemberInfoDto memberInfoDto) {
         try {
-            memberService.checkNameExist(memberInfoDto.getNickName());
-            memberService.updateMemberProfile(principalDetails.getUsername(), memberInfoDto);
-            return ResponseEntity.ok(memberInfoDto);
+
+            String email = principalDetails.getUsername();
+
+            /**
+             * 해당 이미지들을 저장하는 메소드
+             **/
+            memberService.updateProfileImages(email, memberInfoDto);
+
+            memberService.save(email, memberInfoDto);
+
+
+            // requestDto 내용 반환
+            return ResponseEntity.status(HttpStatus.OK).body(memberInfoDto);
+//            memberService.updateMemberProfile(principalDetails.getUsername(), memberInfoDto);
         } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }

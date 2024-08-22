@@ -34,6 +34,10 @@ public class ChatController {
 
         try {
             String email = principalDetails.getUsername();
+
+            // 채팅방 존재 여부 확인
+            chatRoomService.checkChatRoomExist(email, id);
+
             Long chatRoomId = chatRoomService.createRoom(email, id, type);
             ChatRes chatRes = new ChatRes(chatRoomId);
             return ResponseEntity.ok(chatRes);

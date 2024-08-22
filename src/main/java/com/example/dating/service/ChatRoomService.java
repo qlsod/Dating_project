@@ -8,6 +8,7 @@ import com.example.dating.repository.ChatRoomRepository;
 import com.example.dating.repository.MemberRepository;
 import com.example.dating.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ChatRoomService {
 
     private final MemberRepository memberRepository;
@@ -32,6 +34,15 @@ public class ChatRoomService {
         ChatRoom chatRoom = new ChatRoom(member, otherMember, chatRoomId, type);
         chatRoomRepository.save(chatRoom);
         return chatRoom.getId();
+    }
+
+    public void checkChatRoomExist(String email, Long id) {
+        Member member = memberRepository.findByEmail(email).get();
+        int check = chatRoomRepository.countChatRoomsByMemberEmail(member.getId(), id);
+        log.info(String.valueOf(check));
+        if (check > 0) {
+            throw new RuntimeException("이미 채팅방이 존재합니다.");
+        }
     }
 
     public List<ChatListDto> getList(String email, String type) {

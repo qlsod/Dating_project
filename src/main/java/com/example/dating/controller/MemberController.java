@@ -123,6 +123,10 @@ public class MemberController {
         }
     }
 
+    /**
+     *
+     * 다음 작업
+     */
     @Operation(summary = "프로필 수정",
             description = "사용자 프로필을 수정합니다.")
     @SecurityRequirement(name = "accessToken")
@@ -130,6 +134,7 @@ public class MemberController {
     public ResponseEntity<MemberInfoDto> updateMemberProfile(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                              @Validated @RequestBody MemberInfoDto memberInfoDto) {
         try {
+            memberService.checkNameExist(memberInfoDto.getNickName());
             memberService.updateMemberProfile(principalDetails.getUsername(), memberInfoDto);
             return ResponseEntity.ok(memberInfoDto);
         } catch (RuntimeException e) {

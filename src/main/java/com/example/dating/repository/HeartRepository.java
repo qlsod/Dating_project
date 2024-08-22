@@ -5,6 +5,7 @@ import com.example.dating.domain.Member;
 import com.example.dating.dto.heart.HeartMemberDto;
 import com.example.dating.dto.member.MemberCommonDto;
 import com.example.dating.dto.member.MemberInfoDto;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,8 +24,11 @@ public interface HeartRepository extends JpaRepository<Heart, Long> {
 //            "from Heart h left join Member m on h.sender = m where h.receiver.email = :email order by rand()")
 //    List<MemberCommonDto> findFiveRandomMemberByReceiver(@Param("email") String email, Pageable pageable);
 
-    @Query(value = "select m from Heart h left join Member m on h.sender = m where h.receiver.email = :email order by rand()")
-    List<Member> findFiveRandomMemberByReceiver(@Param("email") String email, Pageable pageable);
+    @Query(value = "select m from Heart h left join Member m on h.sender = m where h.receiver.email = :email order by h.id desc")
+    List<Member> findByReceiver(@Param("email") String email, PageRequest pageRequest);
+
+    @Query(value = "select m from Heart h left join Member m on h.sender = m where h.receiver.email = :email and h.id > :id order by h.id desc")
+    List<Member> findPagingMemberByReceiver(@Param("email") String email, @Param("id") Long id, PageRequest pageRequest);
 
     @Query(value = "select m from Heart h left join Member m on h.receiver = m where h.sender.email = :email order by rand()")
     List<Member> findFiveRandomMemberBySender(@Param("email") String email, Pageable pageable);

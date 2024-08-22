@@ -93,30 +93,57 @@ public class HeartService {
     }
 
     /**
-     * 내가 하트를 받은 리스트에서 랜덤 5명 조회
+     * 내가 하트를 받은 리스트에서 최근 10명 조회
      */
     public List<MemberCommonDto> receiverHeartList(String email) {
-        PageRequest pageable = PageRequest.of(0, 5);
-        List<Member> members = heartRepository.findFiveRandomMemberByReceiver(email, pageable);
+        // 1단계: 회원 목록 조회
+        PageRequest pageable = PageRequest.of(0, 10);
+        List<Member> members = heartRepository.findByReceiver(email, pageable);
 
+        // 2단계: 프로필 이미지 목록 조회 및 매핑
+        Map<Long, List<String>> imagesByMemberId = getProfileImagesByMemberIds(members);
+
+        // 3단계: MemberCommonDto로 변환하여 반환
+        return mapMembersToDto(members, imagesByMemberId);
+    }
+
+
+    public List<MemberCommonDto> pagingReceiverHeartList(String email, Long id) {
+        // 1단계: 회원 목록 조회
+        PageRequest pageable = PageRequest.of(0, 10);
+        List<Member> members = heartRepository.findPagingMemberByReceiver(email, id, pageable);
+
+        // 2단계: 프로필 이미지 목록 조회 및 매핑
+        Map<Long, List<String>> imagesByMemberId = getProfileImagesByMemberIds(members);
+
+        // 3단계: MemberCommonDto로 변환하여 반환
+        return mapMembersToDto(members, imagesByMemberId);
+    }
+
+    // 프로필 이미지 목록을 조회하고 회원 ID와 매핑
+    public Map<Long, List<String>> getProfileImagesByMemberIds(List<Member> members) {
         List<Long> memberIds = members.stream()
                 .map(Member::getId)
                 .collect(Collectors.toList());
 
-        // 2단계: 프로필 이미지 목록 조회
         List<ProfileImage> profileImages = profileImagesRepository.findProfileImagesByMemberIds(memberIds);
 
-        // 이미지 목록을 회원과 매핑
-        Map<Long, List<String>> imagesByMemberId = profileImages.stream()
+        return profileImages.stream()
                 .collect(Collectors.groupingBy(
                         pi -> pi.getMember().getId(),
                         Collectors.mapping(ProfileImage::getImage, Collectors.toList())
                 ));
-
-        return members.stream().map(member -> {
-            List<String> images = imagesByMemberId.getOrDefault(member.getId(), Collections.emptyList());
-            return new MemberCommonDto(member, images);
-        }).collect(Collectors.toList());
-
     }
+
+    // 회원 목록과 이미지 매핑 데이터를 사용하여 MemberCommonDto로 변환
+    public List<MemberCommonDto> mapMembersToDto(List<Member> members, Map<Long, List<String>> imagesByMemberId) {
+        return members.stream()
+                .map(member -> {
+                    List<String> images = imagesByMemberId.getOrDefault(member.getId(), Collections.emptyList());
+                    return new MemberCommonDto(member, images);
+                })
+                .collect(Collectors.toList());
+    }
+
+
 }

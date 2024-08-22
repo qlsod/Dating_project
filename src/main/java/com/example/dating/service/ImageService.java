@@ -45,6 +45,7 @@ public class ImageService {
             ObjectMetadata objMeta = new ObjectMetadata();
             objMeta.setContentType(file.getContentType());
             objMeta.setContentLength(file.getSize());
+            objMeta.setContentDisposition("inline"); // 브라우저에서 직접 열도록 설정
 
             try {
                 amazonS3.putObject(bucket, keyName, file.getInputStream(), objMeta);

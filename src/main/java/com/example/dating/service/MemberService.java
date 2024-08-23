@@ -167,11 +167,9 @@ public class MemberService {
     public List<MemberCommonDto> getRandomMemberList(String email) {
         Member findMember = memberRepository.findByEmail(email).get();
 
-        log.info(String.valueOf(findMember));
-
         PageRequest pageRequest = PageRequest.of(0, 20);
 //        return memberRepository.findRandomMember(findMember.getId(), findMember.getGender(), pageRequest);
-        List<Member> members = memberRepository.findRandomRecommendMemberList(findMember.getGender(), pageRequest);
+        List<Member> members = memberRepository.findRandomMember(findMember.getId(), findMember.getGender(), pageRequest);
 
         List<Long> memberIds = members.stream()
                 .map(Member::getId)

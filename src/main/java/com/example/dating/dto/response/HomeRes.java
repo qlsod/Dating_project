@@ -7,6 +7,6 @@ import java.util.List;
 @Data
 public class HomeRes {
     private List<MemberCommonDto> randomMemberList;
-    private List<MemberCommonDto> sendHeartList;
-    private List<MemberCommonDto> receiverHeartList;
+    private List<MemberCommonDto> favoriteMemberList;
+    private List<MemberCommonDto> fanMemberList;
 }

@@ -13,6 +13,7 @@ import com.example.dating.repository.HeartRepository;
 import com.example.dating.repository.MemberRepository;
 import com.example.dating.repository.ProfileImagesRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class HeartService {
 
@@ -66,11 +68,11 @@ public class HeartService {
     }
 
     /**
-     * 내가 하트를 보낸 리스트에서 랜덤 5명 조회
+     * 내가 하트를 보낸 리스트에서 최근 20명 조회
      */
     public List<MemberCommonDto> sendHeartList(String email) {
-        PageRequest pageable = PageRequest.of(0, 5);
-        List<Member> members = heartRepository.findFiveRandomMemberBySender(email, pageable);
+        PageRequest pageable = PageRequest.of(0, 20);
+        List<Member> members = heartRepository.findMemberBySender(email, pageable);
 
         List<Long> memberIds = members.stream()
                 .map(Member::getId)
@@ -93,25 +95,42 @@ public class HeartService {
     }
 
     /**
-     * 내가 하트를 받은 리스트에서 최근 10명 조회
+     * 내가 하트를 받은 리스트에서 최근 20명 조회
      */
     public List<MemberCommonDto> receiverHeartList(String email) {
         // 1단계: 회원 목록 조회
-        PageRequest pageable = PageRequest.of(0, 10);
+        PageRequest pageable = PageRequest.of(0, 20);
         List<Member> members = heartRepository.findByReceiver(email, pageable);
 
-        // 2단계: 프로필 이미지 목록 조회 및 매핑
-        Map<Long, List<String>> imagesByMemberId = getProfileImagesByMemberIds(members);
+        List<Long> memberIds = members.stream()
+                .map(Member::getId)
+                .collect(Collectors.toList());
 
-        // 3단계: MemberCommonDto로 변환하여 반환
-        return mapMembersToDto(members, imagesByMemberId);
+        // 2단계: 프로필 이미지 목록 조회
+        List<ProfileImage> profileImages = profileImagesRepository.findProfileImagesByMemberIds(memberIds);
+
+        // 이미지 목록을 회원과 매핑
+        Map<Long, List<String>> imagesByMemberId = profileImages.stream()
+                .collect(Collectors.groupingBy(
+                        pi -> pi.getMember().getId(),
+                        Collectors.mapping(ProfileImage::getImage, Collectors.toList())
+                ));
+
+        return members.stream().map(member -> {
+            List<String> images = imagesByMemberId.getOrDefault(member.getId(), Collections.emptyList());
+            return new MemberCommonDto(member, images);
+        }).collect(Collectors.toList());
     }
 
 
     public List<MemberCommonDto> pagingReceiverHeartList(String email, Long id) {
         // 1단계: 회원 목록 조회
-        PageRequest pageable = PageRequest.of(0, 10);
+
+        // 일단 10명 TEST
+        PageRequest pageable = PageRequest.of(0, 20);
         List<Member> members = heartRepository.findPagingMemberByReceiver(email, id, pageable);
+
+        log.info(members.toString());
 
         // 2단계: 프로필 이미지 목록 조회 및 매핑
         Map<Long, List<String>> imagesByMemberId = getProfileImagesByMemberIds(members);
@@ -119,6 +138,24 @@ public class HeartService {
         // 3단계: MemberCommonDto로 변환하여 반환
         return mapMembersToDto(members, imagesByMemberId);
     }
+
+    public List<MemberCommonDto> pagingSenderHeartList(String email, Long id) {
+        // 1단계: 회원 목록 조회
+
+        // 일단 10명 TEST
+        PageRequest pageable = PageRequest.of(0, 20);
+        List<Member> members = heartRepository.findPagingMemberBySender(email, id, pageable);
+
+        log.info(members.toString());
+
+        // 2단계: 프로필 이미지 목록 조회 및 매핑
+        Map<Long, List<String>> imagesByMemberId = getProfileImagesByMemberIds(members);
+
+        // 3단계: MemberCommonDto로 변환하여 반환
+        return mapMembersToDto(members, imagesByMemberId);
+    }
+
+
 
     // 프로필 이미지 목록을 조회하고 회원 ID와 매핑
     public Map<Long, List<String>> getProfileImagesByMemberIds(List<Member> members) {

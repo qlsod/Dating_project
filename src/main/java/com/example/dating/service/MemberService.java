@@ -252,6 +252,12 @@ public class MemberService {
     public MemberCommonDto getMemberProfileByEmail(String email) {
         Member findMember = memberRepository.findIdByEmail(email);
         checkMemberExists(findMember);
+
+        // 프로필이 없을 경우 예외 처리
+        if (findMember.getNickName() == null) {
+            throw new RuntimeException("프로필이 등록되지 않았습니다.");
+        }
+
         List<ProfileImage> profileImages = profileImagesRepository.findAllByMemberId(findMember.getId());
 
         // 이미지 URL 리스트를 생성하여 DTO에 추가

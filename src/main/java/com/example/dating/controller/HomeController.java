@@ -46,8 +46,8 @@ public class HomeController {
             HomeRes homeRes = new HomeRes();
 
             homeRes.setRandomMemberList(memberService.getRandomMemberList(email));
-            homeRes.setReceiverHeartList(heartService.receiverHeartList(email));
-            homeRes.setSendHeartList(heartService.sendHeartList(email));
+            homeRes.setFanMemberList(heartService.receiverHeartList(email));
+            homeRes.setFavoriteMemberList(heartService.sendHeartList(email));
 
             return ResponseEntity.ok(homeRes);
         } catch (Exception e) {
@@ -55,25 +55,25 @@ public class HomeController {
         }
     }
 
+//    @GetMapping("/sendHeartList")
+//    public ResponseEntity<Map<String, Object>> sendHeartList(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+//        HashMap<String, Object> response = new HashMap<>();
+//
+//        try {
+//            String email = principalDetails.getUsername();
+//            List<MemberCardDto> sendHeartList = memberService.getSendHeartList(email);
+//
+//            response.put("sendHeartList", sendHeartList);
+//            return ResponseEntity.ok(response);
+//        } catch (Exception e) {
+//            response.put("errorMessage", e.getMessage());
+//            return ResponseEntity.badRequest().body(response);
+//        }
+//    }
 
-
-    @GetMapping("/sendHeartList")
-    public ResponseEntity<Map<String, Object>> sendHeartList(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        HashMap<String, Object> response = new HashMap<>();
-
-        try {
-            String email = principalDetails.getUsername();
-            List<MemberCardDto> sendHeartList = memberService.getSendHeartList(email);
-
-            response.put("sendHeartList", sendHeartList);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("errorMessage", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
-        }
-    }
-
-    @GetMapping("/receiverHeartList/{id}")
+    @Operation(summary = "나한테 관심 있는 사람 리스트 불러오기 Pagination(20명)",
+            description = "나한테 관심 있는 사람 리스트의 마지막 uuid 보내서 다음 리스트 불러오기")
+    @GetMapping("/fan-list/{id}")
     public ResponseEntity<List<MemberCommonDto>> receiverHeartList(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                                    @PathVariable("id") Long id) {
         try {
@@ -82,6 +82,22 @@ public class HomeController {
             List<MemberCommonDto> receiverHeartList = heartService.pagingReceiverHeartList(email, id);
 
             return ResponseEntity.ok(receiverHeartList);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Operation(summary = "내가 관심 있는 사람 리스트 불러오기 Pagination(20명)",
+            description = "내가 관심 있는 사람 리스트의 마지막 uuid 보내서 다음 리스트 불러오기")
+    @GetMapping("/favorite-list/{id}")
+    public ResponseEntity<List<MemberCommonDto>> senderHeartList(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                                                   @PathVariable("id") Long id) {
+        try {
+            String email = principalDetails.getUsername();
+
+            List<MemberCommonDto> senderHeartList = heartService.pagingSenderHeartList(email, id);
+
+            return ResponseEntity.ok(senderHeartList);
         } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }

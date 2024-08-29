@@ -21,20 +21,32 @@ public interface HeartRepository extends JpaRepository<Heart, Long> {
 //            "from Heart h left join Member m on h.sender = m where h.receiver.email = :email order by rand()")
 //    List<MemberCommonDto> findFiveRandomMemberByReceiver(@Param("email") String email, Pageable pageable);
 
-    @Query("select m from Heart h left join Member m on h.sender = m where h.receiver.email = :email order by h.id desc")
+    @Query("select m from Heart h left join Member m on h.sender = m where h.receiver.email = :email " +
+            "and m.id not in (select hm.member.id from HumanMember hm) " +
+            "and m.id not in (SELECT b.blockMember.id FROM Block b WHERE b.blockItMember.email = :email) " +
+            "order by h.id desc")
     List<Member> findByReceiver(@Param("email") String email, PageRequest pageRequest);
 
     @Query("select h.sender from Heart h left join Member m on h.sender = m " +
             "where h.receiver.email = :email " +
-            "and h.id < (select h2.id from Heart h2 where h2.sender.id = :id) order by h.id desc")
+            "and h.id < (select h2.id from Heart h2 where h2.sender.id = :id) " +
+            "and m.id not in (select hm.member.id from HumanMember hm) " +
+            "and m.id not in (SELECT b.blockMember.id FROM Block b WHERE b.blockItMember.email = :email) " +
+            "order by h.id desc")
     List<Member> findPagingMemberByReceiver(@Param("email") String email, @Param("id") Long id, PageRequest pageRequest);
 
 
     @Query("select h.receiver from Heart h left join Member m on h.sender = m " +
             "where h.sender.email = :email " +
-            "and h.id < (select h2.id from Heart h2 where h2.receiver.id = :id) order by h.id desc")
+            "and h.id < (select h2.id from Heart h2 where h2.receiver.id = :id) " +
+            "and m.id not in (select hm.member.id from HumanMember hm) " +
+            "and m.id not in (SELECT b.blockMember.id FROM Block b WHERE b.blockItMember.email = :email) " +
+            "order by h.id desc")
     List<Member> findPagingMemberBySender(@Param("email") String email, @Param("id") Long id, PageRequest pageRequest);
-    @Query(value = "select m from Heart h left join Member m on h.receiver = m where h.sender.email = :email order by h.id desc")
+    @Query(value = "select m from Heart h left join Member m on h.receiver = m where h.sender.email = :email " +
+            "and m.id not in (select hm.member.id from HumanMember hm) " +
+            "and m.id not in (SELECT b.blockMember.id FROM Block b WHERE b.blockItMember.email = :email) " +
+            "order by h.id desc")
     List<Member> findMemberBySender(@Param("email") String email, Pageable pageable);
 
     Integer countBySenderAndReceiver(Member sender, Member receiver);

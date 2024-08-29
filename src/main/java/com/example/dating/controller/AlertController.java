@@ -2,6 +2,7 @@ package com.example.dating.controller;
 
 import com.example.dating.domain.Alert;
 import com.example.dating.dto.alert.AlertDto;
+import com.example.dating.dto.response.alert.AlertRes;
 import com.example.dating.security.auth.PrincipalDetails;
 import com.example.dating.service.AlertService;
 import lombok.RequiredArgsConstructor;
@@ -19,16 +20,19 @@ public class AlertController {
 
     private final AlertService alertService;
 
-    @GetMapping("/alert")
-    public ResponseEntity<Object> getAlert(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        HashMap<String, String> response = new HashMap<>();
-
-        try {
-            List<AlertDto> alertList = alertService.getAlertList(principalDetails.getUsername());
-            return ResponseEntity.ok(alertList);
-        } catch (Exception e) {
-            response.put("errorMessage", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
-        }
-    }
+//    @GetMapping("/alert")
+//    public ResponseEntity<AlertRes> getAlert(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+//
+//        try {
+//
+//            String email = principalDetails.getUsername();
+//
+//            AlertRes alertRes = new AlertRes();
+//            alertRes.setImageList(alertService.getAlertList(email));
+//
+//            return ResponseEntity.ok(alertRes);
+//        } catch (RuntimeException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 }

@@ -1,9 +1,12 @@
 package com.example.dating.dto.fcm;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import javax.persistence.Column;
 import javax.validation.constraints.NotEmpty;
+import java.time.LocalDateTime;
 
 @Getter
 @ToString

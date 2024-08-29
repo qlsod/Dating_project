@@ -1,12 +1,14 @@
 package com.example.dating.domain;
 
 import com.example.dating.dto.alert.AlertDto;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -22,27 +24,32 @@ public class Alert {
     @JoinColumn(name = "RECEIVER_MEMBER_ID")
     private Member receiverMember;
 
-    private String image;
-    private String name;
-    private String message;
-    private String sendAt;
-    private boolean isCheck;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "SENDER_MEMBER_ID")
+    private Member senderMember;
 
-    @Builder
-    public Alert(Member receiverMember, String image, String name, String message, String sendAt, boolean isCheck) {
-        this.receiverMember = receiverMember;
-        this.image = image;
-        this.name = name;
-        this.message = message;
-        this.sendAt = sendAt;
-        this.isCheck = isCheck;
-    }
+    private String content;
 
-    public void check() {
-        this.isCheck = true;
-    }
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd-HH:mm:ss", timezone = "Asia/Seoul")
+    @Column(name = "created_at")
+    private LocalDateTime createdAt; // 보낸 시간
 
-    public AlertDto mapEntityToDto(Alert alert) {
-        return new AlertDto(alert.name, alert.image, alert.message, alert.sendAt, alert.isCheck);
-    }
+    private boolean chatExist;
+
+//    @Builder
+//    public Alert(Member receiverMember, Member senderMember, String content, LocalDateTime createdAt, boolean chatExist) {
+//        this.receiverMember = receiverMember;
+//        this.senderMember = senderMember;
+//        this.content = content;
+//        this.createdAt = createdAt;
+//        this.chatExist = chatExist;
+//    }
+//
+//    public void check() {
+//        this.chatExist = true;
+//    }
+
+//    public AlertDto mapEntityToDto(Alert alert) {
+//        return new AlertDto(alert.senderMember, alert.content, alert.sendAt, alert.chatExist);
+//    }
 }

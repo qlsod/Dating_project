@@ -32,7 +32,7 @@ public class HeartService {
 
     private final HeartRepository heartRepository;
     private final MemberRepository memberRepository;
-    private final AlertRepository alertRepository;
+    private final AlertService alertService;
     private final ProfileImagesRepository profileImagesRepository;
 
     /**
@@ -54,17 +54,20 @@ public class HeartService {
         Heart heart = new Heart(sendMember, receiverMember);
         heartRepository.save(heart);
 
-        // 받는 사람 알림창에 뜰 내용 DB에 저장
-        Alert alert = Alert.builder()
-                .receiverMember(receiverMember)
-                .image(sendMember.getImage())
-                .name(sendMember.getNickName())
-                .message("나에게 하트를 눌렀어요! 마음에 드시나요?")
-                .sendAt(LocalDate.now().toString())
-                .isCheck(false)
-                .build();
+//        alertService.saveAlert(id, "heart", "하트를 받았습니다", );
 
-        alertRepository.save(alert);
+//        // 받는 사람 알림창에 뜰 내용 DB에 저장
+//        Alert alert = Alert.builder()
+//                .receiverMember(receiverMember)
+//                .image(sendMember.getImage())
+//                .name(sendMember.getNickName())
+//                .message("나에게 하트를 눌렀어요! 마음에 드시나요?")
+//                .sendAt(LocalDate.now().toString())
+//                .isCheck(false)
+//                .build();
+//        alertRepository.save(alert);
+
+
     }
 
     /**

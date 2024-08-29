@@ -76,10 +76,10 @@ public class ChatController {
         String email = principalDetails.getUsername();
 
         try {
-            List<ChatOneDto> chatOneDtoList = chatRoomService.getOne(email, roomId);
+            List<ChatOneDto> messages = chatRoomService.getOne(email, roomId);
 
             ChatOneRes chatOneRes = new ChatOneRes();
-            chatOneRes.setChatOneDtoList(chatOneDtoList);
+            chatOneRes.setMessages(messages);
             return ResponseEntity.ok(chatOneRes);
         } catch (RuntimeException e) {
             throw new RuntimeException(e);

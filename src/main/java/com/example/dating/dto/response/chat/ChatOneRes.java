@@ -7,5 +7,5 @@ import java.util.List;
 
 @Data
 public class ChatOneRes {
-    private List<ChatOneDto> chatOneDtoList;
+    private List<ChatOneDto> messages;
 }

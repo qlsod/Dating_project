@@ -105,9 +105,6 @@ public class MemberService {
         // 회원 조회
         checkMemberExists(member);
 
-        // 닉네임 중복 여부 조회
-        checkNameExist(memberInfoDto.getNickName());
-
         // 이미지 URL 리스트 가져오기
         List<String> imageUrls = memberInfoDto.getImages();
 
@@ -129,8 +126,6 @@ public class MemberService {
         // 회원 조회
         checkMemberExists(member);
 
-        // 닉네임 중복 여부 조회
-        checkNameExist(memberInfoDto.getNickName());
 
         // 해당 회원의 저장된 이미지 URL 리스트 가져오기
         List<ProfileImage> existingProfileImages = profileImagesRepository.findAllByMemberId(member.getId());

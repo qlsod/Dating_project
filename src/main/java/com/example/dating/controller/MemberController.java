@@ -295,9 +295,9 @@ public class MemberController {
         }
     }
 
-    // 휴먼유저는 추천에만 안 뜨게.. 설정한 뒤에 로그인하면 자동으로 휴먼계정 해제
-    @Operation(summary = "휴먼유저 설정",
-            description = "사용자 본인을 휴먼유저로 전환합니다.")
+    // 휴면유저는 추천에만 안 뜨게.. 설정한 뒤에 로그인하면 자동으로 휴면계정 해제
+    @Operation(summary = "휴면유저 설정",
+            description = "사용자 본인을 휴면유저로 전환합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "전환 성공"),
             @ApiResponse(responseCode = "400", description = "실패")

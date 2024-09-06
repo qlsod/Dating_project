@@ -5,11 +5,17 @@ import com.example.dating.dto.chat.ChatOneDto;
 import com.example.dating.dto.response.chat.ChatListRes;
 import com.example.dating.dto.response.chat.ChatOneRes;
 import com.example.dating.dto.response.chat.ChatRes;
+import com.example.dating.exception.ExceptionResponseHandler;
 import com.example.dating.security.auth.PrincipalDetails;
 import com.example.dating.service.ChatRoomService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +34,10 @@ public class ChatController {
     @Operation(summary = "채팅 시작",
             description = "사용자 본인, 타켓 사용자 uid 입력받아 채팅방을 생성하여 채팅방 id를 반환합니다.")
     @SecurityRequirement(name = "accessToken")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "채팅방 id 반환"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
     @PostMapping("/create/{id}")
     public ResponseEntity<ChatRes> createChatRoom(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                   @PathVariable Long id, @RequestParam String type) {
@@ -40,7 +50,7 @@ public class ChatController {
 
             Long chatRoomId = chatRoomService.createRoom(email, id, type);
             ChatRes chatRes = new ChatRes(chatRoomId);
-            return ResponseEntity.ok(chatRes);
+            return ResponseEntity.status(HttpStatus.CREATED).body(chatRes);
         } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }
@@ -53,7 +63,6 @@ public class ChatController {
     @GetMapping("/list")
     public ResponseEntity<ChatListRes> getChatRoomList(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                        @RequestParam String type) {
-        HashMap<String, Object> response = new HashMap<>();
         String email = principalDetails.getUsername();
         try {
             List<ChatListDto> chatRoomList = chatRoomService.getList(email, type);

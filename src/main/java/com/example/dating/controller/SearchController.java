@@ -2,12 +2,14 @@ package com.example.dating.controller;
 
 import com.example.dating.domain.Member;
 import com.example.dating.domain.Search;
+import com.example.dating.dto.member.MemberCommonDto;
 import com.example.dating.dto.search.SearchDetailRes;
 import com.example.dating.dto.search.SearchDto;
 import com.example.dating.dto.search.SearchRes;
 import com.example.dating.repository.MemberRepository;
 import com.example.dating.repository.SearchRepository;
 import com.example.dating.security.auth.PrincipalDetails;
+import com.example.dating.service.SearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +33,7 @@ public class SearchController {
 
     private final MemberRepository memberRepository;
     private final SearchRepository searchRepository;
-
+    private final SearchService searchService;
     @Operation(summary = "탐색창 글쓰기",
             description = "해당 사용자가 작성한 글을 저장합니다.")
     @SecurityRequirement(name = "accessToken")
@@ -43,11 +45,7 @@ public class SearchController {
             // 유저 email 꺼내기
             String email = principalDetails.getUsername();
 
-            Member member = memberRepository.findIdByEmail(email);
-            Search search = new Search(member);
-            search.mapDtoToEntity(searchDto);
-
-            searchRepository.save(search);
+            searchService.post(email, searchDto);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(searchDto);
         } catch (Exception e) {
@@ -59,17 +57,10 @@ public class SearchController {
             description = "모든 탐색창 글을 조회합니다.")
     @GetMapping("")
     public ResponseEntity<List<SearchRes>> getSearch() {
-        List<Search> searchList = searchRepository.findAll();
-        List<SearchRes> searchResList = searchList.stream()
-                .map(search -> {
-                    SearchRes searchRes = new SearchRes();
-                    searchRes.entityToDto(search);
-                    return searchRes;
-                })
-                .collect(Collectors.toList());
+
+        List<SearchRes> searchResList = searchService.getList();
 
         return ResponseEntity.ok(searchResList);
-
 
     }
 

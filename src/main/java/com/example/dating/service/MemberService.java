@@ -304,8 +304,28 @@ public class MemberService {
         humanMemberRepository.save(humanMember);
     }
 
-    public List<BlockListDto> getBlockMemberList(String email) {
-        return blockRepository.findByEmail(email);
+    public List<MemberCommonDto> getBlockMemberList(String email) {
+
+        List<Member> members = blockRepository.findByEmail(email);
+
+        List<Long> memberIds = members.stream()
+                .map(Member::getId)
+                .collect(Collectors.toList());
+
+        // 2단계: 프로필 이미지 목록 조회
+        List<ProfileImage> profileImages = profileImagesRepository.findProfileImagesByMemberIds(memberIds);
+
+        // 이미지 목록을 회원과 매핑
+        Map<Long, List<String>> imagesByMemberId = profileImages.stream()
+                .collect(Collectors.groupingBy(
+                        pi -> pi.getMember().getId(),
+                        Collectors.mapping(ProfileImage::getImage, Collectors.toList())
+                ));
+
+        return members.stream().map(member -> {
+            List<String> images = imagesByMemberId.getOrDefault(member.getId(), Collections.emptyList());
+            return new MemberCommonDto(member, images);
+        }).collect(Collectors.toList());
     }
 
     @Transactional

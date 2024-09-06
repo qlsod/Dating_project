@@ -345,16 +345,12 @@ public class MemberController {
     })
     @SecurityRequirement(name = "accessToken")
     @GetMapping("/block")
-    public ResponseEntity<MemberBlockListRes> blockMemberList(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        HashMap<String, Object> response = new HashMap<>();
+    public ResponseEntity<List<MemberCommonDto>> blockMemberList(@AuthenticationPrincipal PrincipalDetails principalDetails) {
 
         try {
             String email = principalDetails.getUsername();
-            List<BlockListDto> blockMemberList = memberService.getBlockMemberList(email);
-
-            MemberBlockListRes blockListRes = new MemberBlockListRes();
-            blockListRes.setBlockMemberList(blockMemberList);
-            return ResponseEntity.ok(blockListRes);
+            List<MemberCommonDto> blockMemberList = memberService.getBlockMemberList(email);
+            return ResponseEntity.ok(blockMemberList);
         } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }

@@ -10,6 +10,7 @@ import com.example.dating.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,6 +34,11 @@ public class HomeController {
 
     @Operation(summary = "메인 화면 API",
             description = "이성 회원 사람 추천 20명, 나한테 관심 있는 사람, 내가 관심 있는 사람 리스트 제공")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "RandomMemberList, FanMemberList, FavoriteMemberList 반환"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    @SecurityRequirement(name = "accessToken")
     @GetMapping({"", "/"})
     public ResponseEntity<HomeRes> home(@AuthenticationPrincipal PrincipalDetails principalDetails) {
 //        HashMap<String, Object> response = new HashMap<>();
@@ -55,24 +61,13 @@ public class HomeController {
         }
     }
 
-//    @GetMapping("/sendHeartList")
-//    public ResponseEntity<Map<String, Object>> sendHeartList(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-//        HashMap<String, Object> response = new HashMap<>();
-//
-//        try {
-//            String email = principalDetails.getUsername();
-//            List<MemberCardDto> sendHeartList = memberService.getSendHeartList(email);
-//
-//            response.put("sendHeartList", sendHeartList);
-//            return ResponseEntity.ok(response);
-//        } catch (Exception e) {
-//            response.put("errorMessage", e.getMessage());
-//            return ResponseEntity.badRequest().body(response);
-//        }
-//    }
-
     @Operation(summary = "나한테 관심 있는 사람 리스트 불러오기 Pagination(20명)",
             description = "나한테 관심 있는 사람 리스트의 마지막 uuid 보내서 다음 리스트 불러오기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "나한테 관심 있는 사람 리스트(20명) 반환"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    @SecurityRequirement(name = "accessToken")
     @GetMapping("/fan-list/{id}")
     public ResponseEntity<List<MemberCommonDto>> receiverHeartList(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                                    @PathVariable("id") Long id) {
@@ -89,6 +84,11 @@ public class HomeController {
 
     @Operation(summary = "내가 관심 있는 사람 리스트 불러오기 Pagination(20명)",
             description = "내가 관심 있는 사람 리스트의 마지막 uuid 보내서 다음 리스트 불러오기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "내가 관심 있는 사람 리스트(20명) 반환"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    @SecurityRequirement(name = "accessToken")
     @GetMapping("/favorite-list/{id}")
     public ResponseEntity<List<MemberCommonDto>> senderHeartList(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                                    @PathVariable("id") Long id) {

@@ -48,8 +48,7 @@ public class ChatRoomService {
     public List<ChatListDto> getList(String email, String type) {
         List<ChatListDto> listByMember = chatRoomRepository.findListByMember(email, type);
         List<ChatListDto> listByOtherMember = chatRoomRepository.findListByOtherMember(email, type);
-//        listByMember.addAll(listByOtherMember);
-//        return listByMember;
+
         // 두 목록을 결합
         List<ChatListDto> combinedList = new ArrayList<>();
         combinedList.addAll(listByMember);

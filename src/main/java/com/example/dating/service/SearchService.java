@@ -11,6 +11,7 @@ import com.example.dating.repository.ProfileImagesRepository;
 import com.example.dating.repository.SearchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -44,9 +45,14 @@ public class SearchService {
     }
 
 
-    public List<SearchRes> getList() {
-        List<Search> searchList = searchRepository.findAll();
 
+
+    public List<SearchRes> getPagingList(Long id) {
+
+        PageRequest pageable = PageRequest.of(0, 20);
+
+
+        List<Search> searchList = searchRepository.findPagingSearch(id, pageable);
 
         // 모든 회원 ID를 조회합니다.
         List<Long> memberIds = searchList.stream()
@@ -77,12 +83,71 @@ public class SearchService {
                     // Search 객체를 SearchRes DTO로 변환합니다.
                     return new SearchRes(
                             search.getTitle(),
+                            search.getContent(),
                             search.getId(),
+                            search.getCreatedAt(),
                             memberCommonDto
                     );
                 })
                 .collect(Collectors.toList());
     }
+
+    public List<SearchRes> getListFirst() {
+
+        PageRequest pageable = PageRequest.of(0, 20);
+
+        List<Search> searchList = searchRepository.findPagingSearchFirst(pageable);
+
+        // 모든 회원 ID를 조회합니다.
+        List<Long> memberIds = searchList.stream()
+                .map(search -> search.getMember().getId())
+                .collect(Collectors.toList());
+
+        // 2단계: 프로필 이미지 목록 조회
+        List<ProfileImage> profileImages = profileImagesRepository.findProfileImagesByMemberIds(memberIds);
+
+        // 이미지 목록을 회원과 매핑
+        Map<Long, List<String>> imagesByMemberId = profileImages.stream()
+                .collect(Collectors.groupingBy(
+                        pi -> pi.getMember().getId(),
+                        Collectors.mapping(ProfileImage::getImage, Collectors.toList())
+                ));
+
+
+        // Search 리스트를 SearchRes DTO 리스트로 변환합니다.
+
+        return searchList.stream()
+                .map(search -> {
+                    // Member 객체를 MemberCommonDto로 변환합니다.
+                    MemberCommonDto memberCommonDto = new MemberCommonDto(
+                            search.getMember(),
+                            imagesByMemberId.getOrDefault(search.getMember().getId(), Collections.emptyList())
+                    );
+
+                    // Search 객체를 SearchRes DTO로 변환합니다.
+                    return new SearchRes(
+                            search.getTitle(),
+                            search.getContent(),
+                            search.getId(),
+                            search.getCreatedAt(),
+                            memberCommonDto
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
+    public void deleteSearch(Long id) {
+        checkSearchExist(id);
+        searchRepository.deleteById(id);
+    }
+
+    public void checkSearchExist(Long id) {
+        Search search = searchRepository.findSearchById(id);
+        if (search == null ) {
+            throw new RuntimeException("해당 글이 존재 하지 않습니다.");
+        }
+    }
+
 
 
 }

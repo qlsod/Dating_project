@@ -145,11 +145,8 @@ public class HeartService {
     public List<MemberCommonDto> pagingSenderHeartList(String email, Long id) {
         // 1단계: 회원 목록 조회
 
-        // 일단 10명 TEST
         PageRequest pageable = PageRequest.of(0, 20);
         List<Member> members = heartRepository.findPagingMemberBySender(email, id, pageable);
-
-        log.info(members.toString());
 
         // 2단계: 프로필 이미지 목록 조회 및 매핑
         Map<Long, List<String>> imagesByMemberId = getProfileImagesByMemberIds(members);

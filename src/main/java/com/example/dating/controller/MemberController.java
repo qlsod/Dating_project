@@ -134,10 +134,6 @@ public class MemberController {
         }
     }
 
-    /**
-     *
-     * 다음 작업
-     */
     @Operation(summary = "프로필 수정",
             description = "사용자 프로필을 수정합니다.")
     @ApiResponses(value = {

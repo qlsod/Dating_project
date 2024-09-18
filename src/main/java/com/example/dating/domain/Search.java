@@ -2,6 +2,7 @@ package com.example.dating.domain;
 
 import com.example.dating.dto.member.MemberInfoDto;
 import com.example.dating.dto.search.SearchDto;
+import com.example.dating.dto.search.SearchPatchDto;
 import com.example.dating.dto.search.SearchRes;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
@@ -36,6 +37,12 @@ public class Search {
         this.title = searchDto.getTitle();
         this.content = searchDto.getContent();
         this.createdAt = searchDto.getCreatedAt();
+    }
+
+    public void updateEntity(SearchPatchDto searchPatchDto) {
+        this.title = searchPatchDto.getTitle();
+        this.content = searchPatchDto.getContent();
+        this.createdAt = searchPatchDto.getCreatedAt();
     }
 
 

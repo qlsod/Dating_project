@@ -39,6 +39,7 @@ public class FcmService {
                 Message message = Message.builder()
                         .setToken(deviceToken)
                         .setNotification(notification)
+                        .putData("chatRoomNo", String.valueOf(fcmSendDto.getChatRoomNo()))
                         .build();
 
                 try {

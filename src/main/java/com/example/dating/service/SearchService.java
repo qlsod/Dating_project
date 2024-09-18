@@ -4,8 +4,7 @@ import com.example.dating.domain.Member;
 import com.example.dating.domain.ProfileImage;
 import com.example.dating.domain.Search;
 import com.example.dating.dto.member.MemberCommonDto;
-import com.example.dating.dto.search.SearchDto;
-import com.example.dating.dto.search.SearchRes;
+import com.example.dating.dto.search.*;
 import com.example.dating.repository.MemberRepository;
 import com.example.dating.repository.ProfileImagesRepository;
 import com.example.dating.repository.SearchRepository;
@@ -13,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,12 +28,12 @@ public class SearchService {
     private final MemberRepository memberRepository;
     private final SearchRepository searchRepository;
     private final ProfileImagesRepository profileImagesRepository;
+    private final MemberService memberService;
 
 
     public void post(String email, SearchDto searchDto) {
 
         try {
-
             Member member = memberRepository.findIdByEmail(email);
             Search search = new Search(member);
             search.mapDtoToEntity(searchDto);
@@ -44,8 +44,30 @@ public class SearchService {
         }
     }
 
+    @Transactional
+    public void update(String email, SearchPatchDto searchPatchDto) {
+
+        isAuthor(email, searchPatchDto.getSearchId());
+        Search search = searchRepository.findSearchById(searchPatchDto.getSearchId());
+        search.updateEntity(searchPatchDto);
+
+    }
+
+    // 해당 유저가 작성한 글인지 확인
+    public void isAuthor(String email, Long id) {
+        Search search = searchRepository.checkAuthor(email, id);
+        if (search == null) {
+            throw new RuntimeException("해당 유저가 작성한 글이 아닙니다.");
+        }
+    }
 
 
+    public List<SearchHistoryRes> getSearchHistory(SearchHistoryDto searchHistoryDto) {
+
+        memberService.checkMemberExistsByNickName(searchHistoryDto.getNickName());
+
+        return searchRepository.findSearchHistory(searchHistoryDto.getNickName());
+    }
 
     public List<SearchRes> getPagingList(Long id) {
 
@@ -136,11 +158,14 @@ public class SearchService {
                 .collect(Collectors.toList());
     }
 
-    public void deleteSearch(Long id) {
+    public void deleteSearch(String email, Long id) {
         checkSearchExist(id);
+        isAuthor(email, id);
         searchRepository.deleteById(id);
     }
 
+
+    // 해당 글 존재 여부 확인
     public void checkSearchExist(Long id) {
         Search search = searchRepository.findSearchById(id);
         if (search == null ) {

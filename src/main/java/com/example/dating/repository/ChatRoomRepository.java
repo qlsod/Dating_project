@@ -5,6 +5,7 @@ import com.example.dating.domain.Member;
 import com.example.dating.dto.chat.ChatListDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -52,5 +53,8 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     Optional<ChatRoom> findChatRoomById(@Param("id") Long id);
 
 
+    @Modifying
+    @Query("DELETE FROM ChatRoom c WHERE c.member = :member OR c.otherMember = :member")
+    void deleteByEmail(Member member);
 
 }

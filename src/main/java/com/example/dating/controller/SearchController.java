@@ -1,11 +1,7 @@
 package com.example.dating.controller;
 
-import com.example.dating.domain.Member;
 import com.example.dating.domain.Search;
-import com.example.dating.dto.member.MemberCommonDto;
-import com.example.dating.dto.search.SearchDetailRes;
-import com.example.dating.dto.search.SearchDto;
-import com.example.dating.dto.search.SearchRes;
+import com.example.dating.dto.search.*;
 import com.example.dating.repository.MemberRepository;
 import com.example.dating.repository.SearchRepository;
 import com.example.dating.security.auth.PrincipalDetails;
@@ -39,6 +35,10 @@ public class SearchController {
     @Operation(summary = "탐색창 글쓰기",
             description = "해당 사용자가 작성한 글을 저장합니다.")
     @SecurityRequirement(name = "accessToken")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "저장된 해당 글 내용 반환"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
     @PostMapping("")
     public ResponseEntity<SearchDto> postSearch(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                 @RequestBody @Valid SearchDto searchDto) {
@@ -93,16 +93,54 @@ public class SearchController {
 //
 //    }
 
-    @Operation(summary =  "탐색창 글 삭제",
+    @Operation(summary =  "내가 쓴 탐색창 List 불러오기",
             description = "탐색창의 id 입력하여 해당 탐색창 삭제")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "삭제 성공"),
             @ApiResponse(responseCode = "400", description = "실패")
     })
     @DeleteMapping("{id}")
-    public ResponseEntity<List<SearchRes>> deleteSearch(@PathVariable("id") Long id) {
-        searchService.deleteSearch(id);
+    public ResponseEntity<Void> deleteSearch(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                             @PathVariable("id") Long id) {
+        String email = principalDetails.getUsername();
+
+        searchService.deleteSearch(email, id);
         return ResponseEntity.ok().build();
     }
+
+
+    @Operation(summary =  "해당 유저가 쓴 탐색창 List 불러오기",
+            description = "유저의 닉네임 입력받아 해당 유저가 쓴 탐색창 List 전체 불러오기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "list 최신 20개 반환"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    @GetMapping("history")
+    public ResponseEntity<List<SearchHistoryRes>> getSearchListHistory(@RequestBody SearchHistoryDto searchHistoryDto) {
+        List<SearchHistoryRes> SearchHistoryResList = searchService.getSearchHistory(searchHistoryDto);
+
+        return ResponseEntity.ok(SearchHistoryResList);
+    }
+
+    @Operation(summary = "탐색창 글 수정",
+            description = "해당 사용자가 작성한 글을 수정합니다.")
+    @SecurityRequirement(name = "accessToken")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "list 최신 20개 반환"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    @PatchMapping("")
+    public ResponseEntity<SearchPatchDto> updateSearch(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                                @RequestBody @Valid SearchPatchDto searchPatchDto) {
+        try {
+            // 유저 email 꺼내기
+            String email = principalDetails.getUsername();
+            searchService.update(email, searchPatchDto);
+            return ResponseEntity.status(HttpStatus.OK).body(searchPatchDto);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 }

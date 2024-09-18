@@ -23,7 +23,6 @@ public class FcmSendDto {
     @NotEmpty(message = "알림 내용을 입력해주세요")
     private String body;
 
-    @NotEmpty(message = "해당 채팅방의 no를 입력해주세요")
     private Long chatRoomNo;
 
 }

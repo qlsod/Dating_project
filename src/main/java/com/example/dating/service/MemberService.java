@@ -36,6 +36,7 @@ public class MemberService {
     private final BlockRepository blockRepository;
     private final HumanMemberRepository humanMemberRepository;
     private final ProfileImagesRepository profileImagesRepository;
+    private final ChatRoomRepository chatRoomRepository;
 
     @Transactional
     public Long join(MemberJoinDto memberJoinDto) throws RuntimeException {
@@ -216,6 +217,11 @@ public class MemberService {
         }
     }
 
+    public void checkMemberExistsByNickName(String nickName) {
+        Member findMember = memberRepository.findByNickName(nickName);
+        checkMemberExists(findMember);
+    }
+
     public MemberCommonDto getMemberProfileByName(String nickName) {
         Member findMember = memberRepository.findByNickName(nickName);
         checkMemberExists(findMember);
@@ -291,9 +297,22 @@ public class MemberService {
         member.updatePassword(encodePassword);
     }
 
+
     @Transactional
     public void deleteMember(String email) {
+        Member member = memberRepository.findIdByEmail(email);
+        checkMemberExists(member);
+
+        log.info("00");
+        chatRoomRepository.deleteByEmail(member);
+        log.info("11");
+
         memberRepository.deleteByEmail(email);
+
+        log.info("22");
+
+
+
     }
 
     @Transactional

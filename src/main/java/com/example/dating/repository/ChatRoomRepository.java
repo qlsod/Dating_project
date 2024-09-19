@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
-    @Query("select c from ChatRoom c where (c.member = :member and c.otherMember = :otherMember) or  (c.member = :otherMember and c.otherMember = :member)")
-    Optional<ChatRoom> findChatRoom(@Param("member") Member member, @Param("otherMember") Member otherMember);
+    @Query("select c.otherMember from ChatRoom c where id = :id")
+    Member findListOtherMember(@Param("id") Long id);
 
     @Query("select count(c) from ChatRoom c " +
             "where (c.member.id = :id and c.otherMember.id = :otherId) " +

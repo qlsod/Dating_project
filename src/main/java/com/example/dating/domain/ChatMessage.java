@@ -20,7 +20,7 @@ public class ChatMessage {
 
     private Long chatRoomId; // 채팅방 id
 
-    private String nickName; // 보낸 사용자 id
+    private String nickName; // 보낸 사용자 닉네임
 
     private String message; // 메시지 내용
 

@@ -1,5 +1,6 @@
 package com.example.dating.controller;
 
+import com.example.dating.domain.ChatRead;
 import com.example.dating.dto.chat.ChatListDto;
 import com.example.dating.dto.chat.ChatOneDto;
 import com.example.dating.dto.response.chat.ChatListRes;
@@ -57,9 +58,33 @@ public class ChatController {
         // 앱 쪽에서 member와 otherMember가 입장했다는 것을 ws/chat으로 보냄
     }
 
+
+    @Operation(summary = "본인 채팅 읽음 표시",
+            description = "해당 채팅방 id 입력하여 읽음 표시")
+    @SecurityRequirement(name = "accessToken")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "읽음 표시 변경 완료"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    @PostMapping("/is-read/{id}")
+    public ResponseEntity<Void> isRead(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                                       @PathVariable Long id) {
+        String email = principalDetails.getUsername();
+        try {
+            chatRoomService.chatIsRead(email, id);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Operation(summary = "본인 채팅방 목록 조회",
             description = "사용자 본인이 포함된 모든 채팅방 목록을 조회합니다.")
     @SecurityRequirement(name = "accessToken")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "모든 채팅방 목록 반환"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
     @GetMapping("/list")
     public ResponseEntity<ChatListRes> getChatRoomList(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                        @RequestParam String type) {
@@ -78,6 +103,10 @@ public class ChatController {
     @Operation(summary = "채팅방 내용 조회",
             description = "타켓 채팅방의 id를 입력받아 해당 채팅방의 내용을 조회합니다.")
     @SecurityRequirement(name = "accessToken")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "채팅방 세부 내용 반환"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
     @GetMapping("/{roomId}")
     public ResponseEntity<ChatOneRes> getChatRoomOne(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                      @PathVariable Long roomId) {

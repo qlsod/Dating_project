@@ -1,9 +1,11 @@
 package com.example.dating.service;
 
+import com.example.dating.domain.ChatRead;
 import com.example.dating.domain.ChatRoom;
 import com.example.dating.domain.Member;
 import com.example.dating.dto.chat.ChatListDto;
 import com.example.dating.dto.chat.ChatOneDto;
+import com.example.dating.repository.ChatReadRepository;
 import com.example.dating.repository.ChatRoomRepository;
 import com.example.dating.repository.MemberRepository;
 import com.example.dating.repository.MessageRepository;
@@ -24,6 +26,7 @@ public class ChatRoomService {
     private final MemberRepository memberRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final MessageRepository messageRepository;
+    private final ChatReadRepository chatReadRepository;
 
     @Transactional
     public Long createRoom(String email, Long id, String type) {
@@ -33,6 +36,11 @@ public class ChatRoomService {
 
         ChatRoom chatRoom = new ChatRoom(member, otherMember, chatRoomId, type);
         chatRoomRepository.save(chatRoom);
+
+        ChatRead chatRead = new ChatRead(chatRoom, member.getId(), false);
+        ChatRead otherChatRead = new ChatRead(chatRoom, otherMember.getId(), false);
+        chatReadRepository.save(chatRead);
+        chatReadRepository.save(otherChatRead);
         return chatRoom.getId();
     }
 

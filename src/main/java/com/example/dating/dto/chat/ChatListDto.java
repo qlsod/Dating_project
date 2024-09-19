@@ -16,4 +16,5 @@ public class ChatListDto {
     private String image;
     private String lastMessage;
     private LocalDateTime time;
+    private Boolean isRead;
 }

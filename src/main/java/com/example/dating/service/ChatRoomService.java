@@ -65,6 +65,15 @@ public class ChatRoomService {
         return combinedList;
     }
 
+    @Transactional
+    public void chatIsRead(String email, Long chatRoomId) {
+
+        Member member = memberRepository.findByEmail(email).get();
+        ChatRead chatRead = chatReadRepository.findByUserIdAndChatRoomId(chatRoomId, member.getId());
+        chatRead.setIsRead(true);
+        chatReadRepository.save(chatRead);
+    }
+
     public List<ChatOneDto> getOne(String email, Long roomId) {
         List<ChatOneDto> messages;
         // email로 member 찾기

@@ -1,7 +1,11 @@
 package com.example.dating.websocket;
 
 import com.example.dating.domain.ChatMessage;
+import com.example.dating.domain.ChatRead;
+import com.example.dating.domain.ChatRoom;
+import com.example.dating.domain.Member;
 import com.example.dating.dto.chat.ChatMessageDto;
+import com.example.dating.repository.ChatReadRepository;
 import com.example.dating.repository.ChatRoomRepository;
 import com.example.dating.repository.MessageRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,11 +36,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private final Map<String, Set<WebSocketSession>> chatRoomSessionMap = new HashMap<>();
 
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatReadRepository chatReadRepository;
     private final MessageRepository messageRepository;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        log.info("Connect Success: " + session.getId());
         sessions.add(session);
     }
 
@@ -56,13 +60,19 @@ public class WebSocketHandler extends TextWebSocketHandler {
             }
 
             ChatMessage chatMessage = new ChatMessage();
+            log.info(String.valueOf(chatMessageDto.getCreateAt()));
             chatMessage.mapToEntity(chatMessageDto);
             messageRepository.save(chatMessage);
+
+            // 해당 채팅을 상대방이 읽지 않은 것으로 처리
+            ChatRoom chatRoom = chatRoomRepository.findById(chatMessage.getChatRoomId()).get();
+            ChatRead chatRead = chatReadRepository.findByUserIdAndChatRoomId(chatRoom.getId(), chatRoom.getOtherMember().getId());
+            chatRead.setIsRead(false);
+            chatReadRepository.save(chatRead);
 
             try {
                 sendMessageToChatRoom(textMessage, chatRoomSessions);
             } catch (IllegalStateException e) {
-                log.error(e.getMessage(), e);
                 removeClosedSession(chatRoomSessions, session);
                 sendMessageToChatRoom(textMessage, chatRoomSessions);
             }
@@ -76,7 +86,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        log.info("Connection closed: " + session.getId());
         sessions.remove(session);
         chatRoomSessionMap.values().forEach(sessions -> sessions.remove(session));
     }

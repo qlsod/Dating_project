@@ -93,7 +93,7 @@ public class SearchController {
 //
 //    }
 
-    @Operation(summary =  "내가 쓴 탐색창 List 불러오기",
+    @Operation(summary =  "탐색창 삭제하기",
             description = "탐색창의 id 입력하여 해당 탐색창 삭제")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "삭제 성공"),
@@ -112,7 +112,7 @@ public class SearchController {
     @Operation(summary =  "해당 유저가 쓴 탐색창 List 불러오기",
             description = "유저의 닉네임 입력받아 해당 유저가 쓴 탐색창 List 전체 불러오기")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "list 최신 20개 반환"),
+            @ApiResponse(responseCode = "200", description = "해당 유저의 탐색창 list 반환"),
             @ApiResponse(responseCode = "400", description = "실패")
     })
     @GetMapping("history")
@@ -126,7 +126,7 @@ public class SearchController {
             description = "해당 사용자가 작성한 글을 수정합니다.")
     @SecurityRequirement(name = "accessToken")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "list 최신 20개 반환"),
+            @ApiResponse(responseCode = "200", description = "저장된 해당 글 내용 반환"),
             @ApiResponse(responseCode = "400", description = "실패")
     })
     @PatchMapping("")

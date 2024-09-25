@@ -47,8 +47,8 @@ public class SearchService {
     @Transactional
     public void update(String email, SearchPatchDto searchPatchDto) {
 
-        isAuthor(email, searchPatchDto.getSearchId());
-        Search search = searchRepository.findSearchById(searchPatchDto.getSearchId());
+        isAuthor(email, searchPatchDto.getId());
+        Search search = searchRepository.findSearchById(searchPatchDto.getId());
         search.updateEntity(searchPatchDto);
 
     }

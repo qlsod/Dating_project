@@ -20,7 +20,7 @@ public class SearchPatchDto {
     @NotEmpty
     private String content;
 
-    private Long searchId;
+    private Long id;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdAt; // 보낸 시간

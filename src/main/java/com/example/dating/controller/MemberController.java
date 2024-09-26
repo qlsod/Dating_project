@@ -141,7 +141,7 @@ public class MemberController {
             @ApiResponse(responseCode = "400", description = "실패")
     })
     @SecurityRequirement(name = "accessToken")
-    @PostMapping("/profile/update")
+    @PatchMapping("/profile")
     public ResponseEntity<MemberInfoDto> updateMemberProfile(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                              @Validated @RequestBody MemberInfoDto memberInfoDto) {
         try {

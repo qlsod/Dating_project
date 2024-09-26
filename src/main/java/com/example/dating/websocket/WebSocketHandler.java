@@ -8,6 +8,7 @@ import com.example.dating.dto.chat.ChatMessageDto;
 import com.example.dating.repository.ChatReadRepository;
 import com.example.dating.repository.ChatRoomRepository;
 import com.example.dating.repository.MessageRepository;
+import com.example.dating.service.ChatService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private final Map<String, Set<WebSocketSession>> chatRoomSessionMap = new HashMap<>();
 
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatService chatService;
     private final ChatReadRepository chatReadRepository;
     private final MessageRepository messageRepository;
 
@@ -46,45 +48,63 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        String payload = message.getPayload();
-        ChatMessageDto chatMessageDto = mapper.readValue(payload, ChatMessageDto.class);
-        String jsonMessage = mapper.writeValueAsString(chatMessageDto);
-        TextMessage textMessage = new TextMessage(jsonMessage);
+        try {
+            String payload = message.getPayload();
+            ChatMessageDto chatMessageDto = mapper.readValue(payload, ChatMessageDto.class);
+            String jsonMessage = mapper.writeValueAsString(chatMessageDto);
+            TextMessage textMessage = new TextMessage(jsonMessage);
 
-        String chatRoomUUID = chatRoomRepository.findChatRoomUUID(chatMessageDto.getChatRoomId());
-        Set<WebSocketSession> chatRoomSessions = chatRoomSessionMap.computeIfAbsent(chatRoomUUID, k -> Collections.synchronizedSet(new HashSet<>()));
+            String chatRoomUUID = chatRoomRepository.findChatRoomUUID(chatMessageDto.getChatRoomId());
+            Set<WebSocketSession> chatRoomSessions = chatRoomSessionMap.computeIfAbsent(chatRoomUUID, k -> Collections.synchronizedSet(new HashSet<>()));
 
-        if (chatMessageDto.getMessageType().equals(MessageType.TALK)) {
-            if (session.isOpen()) {
-                chatRoomSessions.add(session);
+            if (chatMessageDto.getMessageType().equals(MessageType.TALK)) {
+                if (session.isOpen()) {
+                    chatRoomSessions.add(session);
+                }
+
+                chatService.chatCreate(chatMessageDto);
+
+//                ChatMessage chatMessage = new ChatMessage();
+//                chatMessage.mapToEntity(chatMessageDto);
+//                messageRepository.save(chatMessage);
+//
+//                log.info("11");
+//                // 해당 채팅을 상대방이 읽지 않은 것으로 처리
+//                ChatRoom chatRoom = chatRoomRepository.findAllByChatRoomId(chatMessage.getChatRoomId());
+//                if (chatRoom == null) {
+//                    log.error("ChatRoom not found for id: " + chatMessage.getChatRoomId());
+//                    return; // 또는 적절한 예외를 던짐
+//                }
+//                log.info("22");
+//
+//                // 보낸 유저의 닉네임이 Member일경우 OtherMember를, OtherMember일 경우 Member를 고침
+//                ChatRead chatRead = (chatRoom.getMember().getNickName().equals(chatMessage.getNickName())) ?
+//                        chatReadRepository.findByUserIdAndChatRoomId(chatRoom.getId(), chatRoom.getOtherMember().getId()) :
+//                        chatReadRepository.findByUserIdAndChatRoomId(chatRoom.getId(), chatRoom.getMember().getId());
+//
+//                log.info("33");
+//
+//                chatRead.setIsRead(false);
+//                log.info("44");
+//
+//                chatReadRepository.save(chatRead);
+//
+//                log.info("55");
+
+                try {
+                    sendMessageToChatRoom(textMessage, chatRoomSessions);
+                } catch (IllegalStateException e) {
+                    removeClosedSession(chatRoomSessions, session);
+                    sendMessageToChatRoom(textMessage, chatRoomSessions);
+                }
             }
 
-            ChatMessage chatMessage = new ChatMessage();
-            chatMessage.mapToEntity(chatMessageDto);
-            messageRepository.save(chatMessage);
-
-            // 해당 채팅을 상대방이 읽지 않은 것으로 처리
-            ChatRoom chatRoom = chatRoomRepository.findAllByChatRoomId(chatMessage.getChatRoomId());
-
-            // 보낸 유저의 닉네임이 Member일경우 OtherMember를, OtherMember일 경우 Member를 고침
-            ChatRead chatRead = (chatRoom.getMember().getNickName().equals(chatMessage.getNickName())) ?
-                    chatReadRepository.findByUserIdAndChatRoomId(chatRoom.getId(), chatRoom.getOtherMember().getId()) :
-                    chatReadRepository.findByUserIdAndChatRoomId(chatRoom.getId(), chatRoom.getMember().getId());
-
-            chatRead.setIsRead(false);
-            chatReadRepository.save(chatRead);
-
-            try {
-                sendMessageToChatRoom(textMessage, chatRoomSessions);
-            } catch (IllegalStateException e) {
-                removeClosedSession(chatRoomSessions, session);
-                sendMessageToChatRoom(textMessage, chatRoomSessions);
+            if (chatMessageDto.getMessageType().equals(MessageType.QUIT)) {
+                chatRoomSessions.remove(session);
+                session.close();
             }
-        }
-
-        if (chatMessageDto.getMessageType().equals(MessageType.QUIT)) {
-            chatRoomSessions.remove(session);
-            session.close();
+        }catch (Exception e) {
+            log.info(String.valueOf(e));
         }
     }
 

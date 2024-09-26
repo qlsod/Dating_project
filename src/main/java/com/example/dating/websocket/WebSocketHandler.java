@@ -60,13 +60,17 @@ public class WebSocketHandler extends TextWebSocketHandler {
             }
 
             ChatMessage chatMessage = new ChatMessage();
-            log.info(String.valueOf(chatMessageDto.getCreateAt()));
             chatMessage.mapToEntity(chatMessageDto);
             messageRepository.save(chatMessage);
 
             // 해당 채팅을 상대방이 읽지 않은 것으로 처리
-            ChatRoom chatRoom = chatRoomRepository.findById(chatMessage.getChatRoomId()).get();
-            ChatRead chatRead = chatReadRepository.findByUserIdAndChatRoomId(chatRoom.getId(), chatRoom.getOtherMember().getId());
+            ChatRoom chatRoom = chatRoomRepository.findAllByChatRoomId(chatMessage.getChatRoomId());
+
+            // 보낸 유저의 닉네임이 Member일경우 OtherMember를, OtherMember일 경우 Member를 고침
+            ChatRead chatRead = (chatRoom.getMember().getNickName().equals(chatMessage.getNickName())) ?
+                    chatReadRepository.findByUserIdAndChatRoomId(chatRoom.getId(), chatRoom.getOtherMember().getId()) :
+                    chatReadRepository.findByUserIdAndChatRoomId(chatRoom.getId(), chatRoom.getMember().getId());
+
             chatRead.setIsRead(false);
             chatReadRepository.save(chatRead);
 

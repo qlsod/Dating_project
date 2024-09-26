@@ -1,12 +1,18 @@
 package com.example.dating.controller;
 
+import com.example.dating.domain.ChatMessage;
 import com.example.dating.domain.ChatRead;
+import com.example.dating.domain.ChatRoom;
 import com.example.dating.dto.chat.ChatListDto;
+import com.example.dating.dto.chat.ChatMessageDto;
 import com.example.dating.dto.chat.ChatOneDto;
 import com.example.dating.dto.response.chat.ChatListRes;
 import com.example.dating.dto.response.chat.ChatOneRes;
 import com.example.dating.dto.response.chat.ChatRes;
 import com.example.dating.exception.ExceptionResponseHandler;
+import com.example.dating.repository.ChatReadRepository;
+import com.example.dating.repository.ChatRoomRepository;
+import com.example.dating.repository.MessageRepository;
 import com.example.dating.security.auth.PrincipalDetails;
 import com.example.dating.service.ChatRoomService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +22,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,6 +35,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/chat")
 @RequiredArgsConstructor
+@Slf4j
 public class ChatController {
 
     private final ChatRoomService chatRoomService;
@@ -41,7 +49,7 @@ public class ChatController {
     })
     @PostMapping("/create/{id}")
     public ResponseEntity<ChatRes> createChatRoom(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                                  @PathVariable Long id, @RequestParam String type) {
+                                                  @PathVariable Long id, @RequestParam(value = "type") String type) {
 
         try {
             String email = principalDetails.getUsername();

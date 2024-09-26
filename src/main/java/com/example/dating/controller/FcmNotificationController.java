@@ -33,7 +33,7 @@ public class FcmNotificationController {
     public ResponseEntity<Void> sendNotificationByToken(@RequestBody @Valid FcmSendDto fcmSendDto) {
 
         fcmService.sendPush(fcmSendDto);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
 }

@@ -42,6 +42,14 @@ public class ChatService {
     }
 
 
+    @Transactional
+    public void deleteChat(Long chatRoomId) {
+        messageRepository.deleteByChatRoomId(chatRoomId);
+        chatReadRepository.deleteByChatRoomId(chatRoomId);
+        chatRoomRepository.deleteById(chatRoomId);
+    }
+
+
 
 
 }

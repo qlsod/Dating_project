@@ -32,9 +32,9 @@ public class ChatRoomService {
     public Long createRoom(String email, Long id, String type) {
         Member member = memberRepository.findByEmail(email).get();
         Member otherMember = memberRepository.findById(id).get();
-        String chatRoomId = UUID.randomUUID().toString();
+//        String chatRoomId = UUID.randomUUID().toString();
 
-        ChatRoom chatRoom = new ChatRoom(member, otherMember, chatRoomId, type);
+        ChatRoom chatRoom = new ChatRoom(member, otherMember, type);
         chatRoomRepository.save(chatRoom);
 
         ChatRead chatRead = new ChatRead(chatRoom, member.getId(), true);

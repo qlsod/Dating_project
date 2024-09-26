@@ -23,7 +23,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
             "or (c.member.id = :otherId and c.otherMember.id = :id)")
     int countChatRoomsByMemberEmail(@Param("id") Long id, @Param("otherId") Long otherId);
 
-    @Query("select c.uuid from ChatRoom c where c.id = :id")
+    @Query("select c.id from ChatRoom c where c.id = :id")
     String findChatRoomUUID(@Param("id") Long id);
 
     @Query("SELECT new com.example.dating.dto.chat.ChatListDto(c.id, c.otherMember.nickName, c.otherMember.image, cm.message, cm.createdAt, COALESCE(cr.isRead, false)) " +

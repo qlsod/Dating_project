@@ -23,14 +23,14 @@ public class ChatRoom {
     @JoinColumn(name = "OTHER_MEMBER_ID")
     private Member otherMember;
 
-    private String uuid;
+//    private String uuid;
 
     private String type;
 
-    public ChatRoom(Member member, Member otherMember, String uuid, String type) {
+    public ChatRoom(Member member, Member otherMember, String type) {
         this.member = member;
         this.otherMember = otherMember;
-        this.uuid = uuid;
+//        this.uuid = uuid;
         this.type = type;
     }
 }

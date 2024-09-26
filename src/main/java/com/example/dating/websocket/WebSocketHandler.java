@@ -54,8 +54,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
             String jsonMessage = mapper.writeValueAsString(chatMessageDto);
             TextMessage textMessage = new TextMessage(jsonMessage);
 
-            String chatRoomUUID = chatRoomRepository.findChatRoomUUID(chatMessageDto.getChatRoomId());
-            Set<WebSocketSession> chatRoomSessions = chatRoomSessionMap.computeIfAbsent(chatRoomUUID, k -> Collections.synchronizedSet(new HashSet<>()));
+            Long chatRoomId = chatMessageDto.getChatRoomId();
+            Set<WebSocketSession> chatRoomSessions = chatRoomSessionMap.computeIfAbsent(String.valueOf(chatRoomId), k -> Collections.synchronizedSet(new HashSet<>()));
 
             if (chatMessageDto.getMessageType().equals(MessageType.TALK)) {
                 if (session.isOpen()) {
@@ -63,33 +63,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 }
 
                 chatService.chatCreate(chatMessageDto);
-
-//                ChatMessage chatMessage = new ChatMessage();
-//                chatMessage.mapToEntity(chatMessageDto);
-//                messageRepository.save(chatMessage);
-//
-//                log.info("11");
-//                // 해당 채팅을 상대방이 읽지 않은 것으로 처리
-//                ChatRoom chatRoom = chatRoomRepository.findAllByChatRoomId(chatMessage.getChatRoomId());
-//                if (chatRoom == null) {
-//                    log.error("ChatRoom not found for id: " + chatMessage.getChatRoomId());
-//                    return; // 또는 적절한 예외를 던짐
-//                }
-//                log.info("22");
-//
-//                // 보낸 유저의 닉네임이 Member일경우 OtherMember를, OtherMember일 경우 Member를 고침
-//                ChatRead chatRead = (chatRoom.getMember().getNickName().equals(chatMessage.getNickName())) ?
-//                        chatReadRepository.findByUserIdAndChatRoomId(chatRoom.getId(), chatRoom.getOtherMember().getId()) :
-//                        chatReadRepository.findByUserIdAndChatRoomId(chatRoom.getId(), chatRoom.getMember().getId());
-//
-//                log.info("33");
-//
-//                chatRead.setIsRead(false);
-//                log.info("44");
-//
-//                chatReadRepository.save(chatRead);
-//
-//                log.info("55");
 
                 try {
                     sendMessageToChatRoom(textMessage, chatRoomSessions);
@@ -101,6 +74,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
             if (chatMessageDto.getMessageType().equals(MessageType.QUIT)) {
                 chatRoomSessions.remove(session);
+                chatMessageDto.setMessage(chatMessageDto.getNickName() + "님이 퇴장했습니다.");
+                sendMessageToChatRoom(new TextMessage(mapper.writeValueAsString(chatMessageDto)), chatRoomSessions);
                 session.close();
             }
         }catch (Exception e) {
@@ -108,11 +83,41 @@ public class WebSocketHandler extends TextWebSocketHandler {
         }
     }
 
+    private void sendToEachSocket(Set<WebSocketSession> sessions, TextMessage message) {
+        sessions.parallelStream().forEach(roomSession -> {
+            try {
+                roomSession.sendMessage(message);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+
+
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+
         sessions.remove(session);
         chatRoomSessionMap.values().forEach(sessions -> sessions.remove(session));
+
+        // 해당 session이 속한 chatRoom을 찾는다.
+        for (Map.Entry<String, Set<WebSocketSession>> entry : chatRoomSessionMap.entrySet()) {
+            Set<WebSocketSession> chatRoomSessions = entry.getValue();
+            chatRoomSessions.remove(session);  // 해당 session 제거
+
+            // 채팅방에 사용자가 없는 경우 메시지 삭제
+            if (chatRoomSessions.isEmpty()) {
+                Long chatRoomId = Long.parseLong(entry.getKey());
+
+                chatService.deleteChat(chatRoomId);
+
+                // 채팅방 세션 맵에서도 제거
+                chatRoomSessionMap.remove(chatRoomId);
+            }
+        }
     }
+
 
     private void removeClosedSession(Set<WebSocketSession> sessions, WebSocketSession session) {
         sessions.removeIf(s -> !s.isOpen());

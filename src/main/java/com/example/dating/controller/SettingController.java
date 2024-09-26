@@ -3,6 +3,9 @@ package com.example.dating.controller;
 import com.example.dating.dto.setting.ChangePasswordDto;
 import com.example.dating.security.auth.PrincipalDetails;
 import com.example.dating.service.SettingService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -35,16 +38,20 @@ public class SettingController {
         }
     }
 
+    @Operation(summary = "비밀번호 변경",
+            description = "현재 PW, 바꾸고 싶은 PW 입력하여 비밀번호 변경")
     @SecurityRequirement(name = "accessToken")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "비밀번호 변경 성공"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
     @PostMapping("/password")
-    public ResponseEntity<Map<String, String>> changePassword(@AuthenticationPrincipal PrincipalDetails principalDetails,
+    public ResponseEntity<Void> changePassword(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                               @RequestBody @Valid ChangePasswordDto changePasswordDto) {
-        HashMap<String, String> response = new HashMap<>();
 
         String email = principalDetails.getUsername();
         settingService.changePassword(email, changePasswordDto);
-        response.put("successMessage", "비밀번호 변경 성공");
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok().build();
 
     }
 }

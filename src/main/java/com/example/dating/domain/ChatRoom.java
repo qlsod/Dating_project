@@ -1,5 +1,6 @@
 package com.example.dating.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +9,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class ChatRoom {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "CHATROOM_ID")

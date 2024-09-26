@@ -37,7 +37,7 @@ public class ChatRoomService {
         ChatRoom chatRoom = new ChatRoom(member, otherMember, chatRoomId, type);
         chatRoomRepository.save(chatRoom);
 
-        ChatRead chatRead = new ChatRead(chatRoom, member.getId(), false);
+        ChatRead chatRead = new ChatRead(chatRoom, member.getId(), true);
         ChatRead otherChatRead = new ChatRead(chatRoom, otherMember.getId(), false);
         chatReadRepository.save(chatRead);
         chatReadRepository.save(otherChatRead);

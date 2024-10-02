@@ -8,13 +8,25 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
-    @Query("select c.otherMember from ChatRoom c where id = :id")
-    Member findListOtherMember(@Param("id") Long id);
+    @Query("select c.otherMember from ChatRoom c where c.id = :id")
+    Member findOtherMember(@Param("id") Long id);
+
+    @Query("select c.member from ChatRoom c where c.id = :id")
+    Member findMember(@Param("id") Long id);
+
+    @Modifying
+    @Query("update ChatRoom c set c.member = null where c.id = :id")
+    void deleteMember(@Param("id") Long id);
+
+    @Modifying
+    @Query("update ChatRoom c set c.otherMember = null where c.id = :id")
+    void deleteOtherMember(@Param("id") Long id);
 
     @Query("select c from ChatRoom c where id = :id")
     ChatRoom findAllByChatRoomId(@Param("id") Long id);
@@ -22,6 +34,9 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
             "where (c.member.id = :id and c.otherMember.id = :otherId) " +
             "or (c.member.id = :otherId and c.otherMember.id = :id)")
     int countChatRoomsByMemberEmail(@Param("id") Long id, @Param("otherId") Long otherId);
+
+    @Query("select count(c) from ChatRoom c where c.member.nickName = :nickName and c.id = :id")
+    int checkMemberByNickName(@Param("id") Long id, @Param("nickName") String nickName);
 
     @Query("select c.id from ChatRoom c where c.id = :id")
     String findChatRoomUUID(@Param("id") Long id);

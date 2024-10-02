@@ -73,10 +73,13 @@ public class WebSocketHandler extends TextWebSocketHandler {
             }
 
             if (chatMessageDto.getMessageType().equals(MessageType.QUIT)) {
-                chatRoomSessions.remove(session);
-                chatMessageDto.setMessage(chatMessageDto.getNickName() + "님이 퇴장했습니다.");
-                sendMessageToChatRoom(new TextMessage(mapper.writeValueAsString(chatMessageDto)), chatRoomSessions);
-                session.close();
+
+                chatService.deleteChat(chatMessageDto);
+
+//                chatRoomSessions.remove(session);
+//                chatMessageDto.setMessage(chatMessageDto.getNickName() + "님이 퇴장했습니다.");
+//                sendMessageToChatRoom(new TextMessage(mapper.writeValueAsString(chatMessageDto)), chatRoomSessions);
+//                session.close();
             }
         }catch (Exception e) {
             log.info(String.valueOf(e));
@@ -102,18 +105,23 @@ public class WebSocketHandler extends TextWebSocketHandler {
         chatRoomSessionMap.values().forEach(sessions -> sessions.remove(session));
 
         // 해당 session이 속한 chatRoom을 찾는다.
+        log.info("해당 session이 속한 chatRoom을 찾는다.");
         for (Map.Entry<String, Set<WebSocketSession>> entry : chatRoomSessionMap.entrySet()) {
             Set<WebSocketSession> chatRoomSessions = entry.getValue();
             chatRoomSessions.remove(session);  // 해당 session 제거
 
             // 채팅방에 사용자가 없는 경우 메시지 삭제
+            log.info("채팅방에 사용자가 없는 경우 메시지 삭제");
+
             if (chatRoomSessions.isEmpty()) {
                 Long chatRoomId = Long.parseLong(entry.getKey());
 
-                chatService.deleteChat(chatRoomId);
+//                chatService.deleteChat(chatRoomId);
 
                 // 채팅방 세션 맵에서도 제거
                 chatRoomSessionMap.remove(chatRoomId);
+
+                log.info("다 제거됨");
             }
         }
     }

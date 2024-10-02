@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Schema(description = "/fcm RequestDto")
+@AllArgsConstructor
 public class FcmSendDto {
 
     @NotEmpty(message = "상대방의 이름을 입력해주세요")

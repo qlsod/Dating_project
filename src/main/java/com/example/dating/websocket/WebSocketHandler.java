@@ -76,10 +76,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
                 chatService.deleteChat(chatMessageDto);
 
-//                chatRoomSessions.remove(session);
-//                chatMessageDto.setMessage(chatMessageDto.getNickName() + "님이 퇴장했습니다.");
-//                sendMessageToChatRoom(new TextMessage(mapper.writeValueAsString(chatMessageDto)), chatRoomSessions);
-//                session.close();
+                chatRoomSessions.remove(session);
+                chatMessageDto.setMessage(chatMessageDto.getNickName() + "님이 퇴장했습니다.");
+                sendMessageToChatRoom(new TextMessage(mapper.writeValueAsString(chatMessageDto)), chatRoomSessions);
+                session.close();
             }
         }catch (Exception e) {
             log.info(String.valueOf(e));

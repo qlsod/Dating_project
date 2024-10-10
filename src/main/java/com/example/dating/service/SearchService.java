@@ -69,12 +69,11 @@ public class SearchService {
         return searchRepository.findSearchHistory(searchHistoryDto.getNickName());
     }
 
-    public List<SearchRes> getPagingList(Long id) {
+    public List<SearchRes> getPagingList(Long id, String email) {
 
         PageRequest pageable = PageRequest.of(0, 20);
-
-
-        List<Search> searchList = searchRepository.findPagingSearch(id, pageable);
+        Member member = memberRepository.findIdByEmail(email);
+        List<Search> searchList = searchRepository.findPagingSearch(id, pageable, member.getId());
 
         // 모든 회원 ID를 조회합니다.
         List<Long> memberIds = searchList.stream()
@@ -114,11 +113,12 @@ public class SearchService {
                 .collect(Collectors.toList());
     }
 
-    public List<SearchRes> getListFirst() {
+    public List<SearchRes> getListFirst(String email) {
 
         PageRequest pageable = PageRequest.of(0, 20);
+        Member member = memberRepository.findIdByEmail(email);
 
-        List<Search> searchList = searchRepository.findPagingSearchFirst(pageable);
+        List<Search> searchList = searchRepository.findPagingSearchFirst(pageable, member.getId());
 
         // 모든 회원 ID를 조회합니다.
         List<Long> memberIds = searchList.stream()

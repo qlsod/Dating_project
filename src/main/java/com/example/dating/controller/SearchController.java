@@ -59,9 +59,10 @@ public class SearchController {
             @ApiResponse(responseCode = "400", description = "실패")
     })
     @GetMapping("list")
-    public ResponseEntity<List<SearchRes>> getSearch() {
+    public ResponseEntity<List<SearchRes>> getSearch(@AuthenticationPrincipal PrincipalDetails principalDetails) {
 
-        List<SearchRes> searchResList = searchService.getListFirst();
+        String email = principalDetails.getUsername();
+        List<SearchRes> searchResList = searchService.getListFirst(email);
 
         return ResponseEntity.ok(searchResList);
 
@@ -74,8 +75,10 @@ public class SearchController {
             @ApiResponse(responseCode = "400", description = "실패")
     })
     @GetMapping("list/{id}")
-    public ResponseEntity<List<SearchRes>> getSearchListPagination(@PathVariable("id") Long id) {
-        List<SearchRes> searchResList = searchService.getPagingList(id);
+    public ResponseEntity<List<SearchRes>> getSearchListPagination(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                                                   @PathVariable("id") Long id) {
+        String email = principalDetails.getUsername();
+        List<SearchRes> searchResList = searchService.getPagingList(id, email);
 
         return ResponseEntity.ok(searchResList);
     }

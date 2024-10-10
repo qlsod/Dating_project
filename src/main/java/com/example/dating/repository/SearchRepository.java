@@ -15,11 +15,14 @@ public interface SearchRepository extends JpaRepository<Search, Long> {
     @Query("select s from Search s where id = :id")
     Search findSearchById(@Param("id") Long id);
 
-    @Query("select s from Search s where s.id < :id order by s.id desc")
-    List<Search> findPagingSearch(@Param("id") Long id, PageRequest pageRequest);
+    @Query("select s from Search s " +
+            "where s.id < :id and s.member.id not in (SELECT b.blockMember.id FROM Block b WHERE b.blockItMember.id = :userId)" +
+            "order by s.id desc")
+    List<Search> findPagingSearch(@Param("id") Long id, PageRequest pageRequest, @Param("userId") Long userId);
 
-    @Query("select s from Search s order by s.id desc")
-    List<Search> findPagingSearchFirst(PageRequest pageRequest);
+    @Query("select s from Search s " +
+            "where s.member.id not in (SELECT b.blockMember.id FROM Block b WHERE b.blockItMember.id = :id) order by s.id desc")
+    List<Search> findPagingSearchFirst(PageRequest pageRequest, @Param("id") Long id);
 
     @Query("select s from Search s where s.member.email = :email and s.id = :id")
     Search checkAuthor(@Param("email") String email, @Param("id") Long id);

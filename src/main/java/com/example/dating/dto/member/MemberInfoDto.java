@@ -2,6 +2,7 @@ package com.example.dating.dto.member;
 
 import com.example.dating.domain.Member;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class MemberInfoDto {
 
     @NotEmpty(message = "이름을 입력해주세요")
@@ -45,9 +47,6 @@ public class MemberInfoDto {
 
 //    @NotEmpty(message = "인적사항을 입력해주세요")
     private String personalInfo;
-
-//    @NotEmpty(message = "mbti를 입력해주세요")
-//    private String mbti;
 
 //    @NotEmpty(message = "성격을 입력해주세요")
     private String personality;

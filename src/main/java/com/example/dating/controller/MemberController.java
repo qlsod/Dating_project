@@ -1,10 +1,6 @@
 package com.example.dating.controller;
 
-import com.example.dating.domain.Member;
-import com.example.dating.dto.block.BlockListDto;
-import com.example.dating.dto.email.EmailDto;
 import com.example.dating.dto.member.*;
-import com.example.dating.dto.response.member.MemberBlockListRes;
 import com.example.dating.dto.response.member.MemberJoinRes;
 import com.example.dating.dto.response.member.MemberMailRes;
 import com.example.dating.service.EmailService;
@@ -23,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +27,6 @@ import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/member")

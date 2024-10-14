@@ -49,20 +49,15 @@ public class ChatService {
 
     @Transactional
     public void deleteChat(ChatMessageDto chatMessageDto) {
-        log.info("1");
         int isMember = chatRoomRepository.checkMemberByNickName(chatMessageDto.getChatRoomId(), chatMessageDto.getNickName());
-        log.info("11111");
 
-        Member member = (isMember == 0) ? chatRoomRepository.findOtherMember(chatMessageDto.getChatRoomId()) :
-                chatRoomRepository.findMember(chatMessageDto.getChatRoomId());
-        log.info("2");
+        Member targetMember = (isMember == 0) ? chatRoomRepository.findMember(chatMessageDto.getChatRoomId()) :
+                chatRoomRepository.findOtherMember(chatMessageDto.getChatRoomId());
 
-        FcmSendDto fcmSendDto = new FcmSendDto(member.getNickName(), member.getNickName(),
+        FcmSendDto fcmSendDto = new FcmSendDto(targetMember.getNickName(), chatMessageDto.getNickName(),
             chatMessageDto.getMessage(), chatMessageDto.getChatRoomId());
-        log.info("3");
 
         fcmService.sendPush(fcmSendDto);
-        log.info("4");
 
         messageRepository.deleteByChatRoomId(chatMessageDto.getChatRoomId());
         chatReadRepository.deleteByChatRoomId(chatMessageDto.getChatRoomId());

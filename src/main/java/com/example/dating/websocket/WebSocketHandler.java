@@ -77,7 +77,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 chatService.deleteChat(chatMessageDto);
 
                 chatRoomSessions.remove(session);
-                chatMessageDto.setMessage(chatMessageDto.getNickName() + "님이 퇴장했습니다.");
+//                chatMessageDto.setMessage(chatMessageDto.getNickName() + "님이 퇴장했습니다.");
                 sendMessageToChatRoom(new TextMessage(mapper.writeValueAsString(chatMessageDto)), chatRoomSessions);
                 session.close();
             }

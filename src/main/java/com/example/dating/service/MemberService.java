@@ -37,6 +37,7 @@ public class MemberService {
     private final HumanMemberRepository humanMemberRepository;
     private final ProfileImagesRepository profileImagesRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatReadRepository chatReadRepository;
 
     @Transactional
     public Long join(MemberJoinDto memberJoinDto) throws RuntimeException {
@@ -303,7 +304,7 @@ public class MemberService {
         Member member = memberRepository.findIdByEmail(email);
         checkMemberExists(member);
 
-        log.info("00");
+
         chatRoomRepository.deleteByEmail(member);
         log.info("11");
 

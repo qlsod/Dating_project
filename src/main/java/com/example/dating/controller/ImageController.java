@@ -6,6 +6,7 @@ import com.example.dating.service.ImageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/images")
 public class ImageController {
 
@@ -25,7 +27,7 @@ public class ImageController {
     @SecurityRequirement(name = "accessToken")
     @PostMapping("/s3-upload")
     public ResponseEntity<ImageRes> postImageUpload(@RequestPart(value = "file") List<MultipartFile> multipartFiles, @AuthenticationPrincipal PrincipalDetails principalDetails,
-                                                    @RequestParam String type) {
+                                                    @RequestParam(value = "type") String type) {
 
         // 파일 존재 여부 확인
         imageService.validateFileExists(multipartFiles);

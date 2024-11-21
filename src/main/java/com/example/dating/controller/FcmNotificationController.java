@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/fcm")
 @RequiredArgsConstructor
+@Slf4j
 public class FcmNotificationController {
 
     private final FcmService fcmService;
@@ -32,6 +34,7 @@ public class FcmNotificationController {
     @PostMapping("")
     public ResponseEntity<Void> sendNotificationByToken(@RequestBody @Valid FcmSendDto fcmSendDto) {
 
+        log.info("fcmRequest");
         fcmService.sendPush(fcmSendDto);
         return ResponseEntity.ok().build();
     }
